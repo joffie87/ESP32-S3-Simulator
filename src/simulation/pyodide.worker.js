@@ -1,4 +1,8 @@
-import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.mjs'
+// Use dynamic import to avoid Vite build issues
+const loadPyodide = async () => {
+  const module = await import('https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.mjs')
+  return module.loadPyodide
+}
 
 let pyodide = null
 const INPUT_STATES = new Array(40).fill(0)
@@ -111,7 +115,8 @@ async function initializePyodide() {
     self.postMessage({ type: 'STATUS', status: 'loading' })
 
     console.log('[Pyodide Worker] Loading Pyodide from CDN...')
-    pyodide = await loadPyodide({
+    const loader = await loadPyodide()
+    pyodide = await loader({
       indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/'
     })
 

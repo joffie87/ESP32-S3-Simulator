@@ -4593,7 +4593,7 @@ while True:
     for i in range(3): flash(0.2)
     
     time.sleep(2) # Pause before repeating
-`};function GQA({isVisible:g,onClose:A}){const{pinStates:I,setPinStates:C,workerRef:i}=Ms(),[B,e]=J.useState(ap["1. Basic Blink"]),[t,o]=J.useState(""),[n,r]=J.useState(!0),[c,h]=J.useState(50),[S,u]=J.useState(!1),[d,f]=J.useState(!1),[y,G]=J.useState(!1),p=J.useRef(null),K=J.useRef(null);J.useEffect(()=>{const $=()=>{G(window.innerWidth<=768)};return $(),window.addEventListener("resize",$),()=>window.removeEventListener("resize",$)},[]),J.useEffect(()=>{i.current||(i.current=new Worker(new URL("/ESP32-S3-Simulator/assets/pyodide.worker-C-GUqEiU.js",import.meta.url),{type:"module"}),i.current.onmessage=$=>{const{type:_,status:gA,output:oA,error:sA,pin:aA,value:T}=$.data;_==="STATUS"&&gA==="ready"?(r(!1),o(X=>X+`> System Ready.
+`};function GQA({isVisible:g,onClose:A}){const{pinStates:I,setPinStates:C,workerRef:i}=Ms(),[B,e]=J.useState(ap["1. Basic Blink"]),[t,o]=J.useState(""),[n,r]=J.useState(!0),[c,h]=J.useState(50),[S,u]=J.useState(!1),[d,f]=J.useState(!1),[y,G]=J.useState(!1),p=J.useRef(null),K=J.useRef(null);J.useEffect(()=>{const $=()=>{G(window.innerWidth<=768)};return $(),window.addEventListener("resize",$),()=>window.removeEventListener("resize",$)},[]),J.useEffect(()=>{i.current||(i.current=new Worker(new URL("/ESP32-S3-Simulator/assets/pyodide.worker-CzQcSBe4.js",import.meta.url),{type:"module"}),i.current.onmessage=$=>{const{type:_,status:gA,output:oA,error:sA,pin:aA,value:T}=$.data;_==="STATUS"&&gA==="ready"?(r(!1),o(X=>X+`> System Ready.
 `)):_==="STATUS"&&gA==="error"?(r(!1),o(X=>X+`
 [FATAL ERROR]: Pyodide failed to load. Check console for details.
 `)):_==="OUTPUT"?o(X=>X+oA):_==="ERROR"?o(X=>X+`
