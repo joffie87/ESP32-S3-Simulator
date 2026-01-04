@@ -69,8 +69,20 @@ export default function CodingOverlay({ isVisible, onClose }) {
   const [loading, setLoading] = useState(true)
   const [splitPosition, setSplitPosition] = useState(50) // Percentage for left panel
   const [isDragging, setIsDragging] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false) // For mobile sidebar toggle
+  const [isMobile, setIsMobile] = useState(false)
   const fileInputRef = useRef(null)
   const containerRef = useRef(null)
+
+  // Detect mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // --- WORKER SETUP (Identical to before) ---
   useEffect(() => {
@@ -177,11 +189,19 @@ export default function CodingOverlay({ isVisible, onClose }) {
     container: {
       position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
       backgroundColor: '#1e1e1e', zIndex: 2000, display: 'flex',
-      color: '#d4d4d4', fontFamily: 'monospace'
+      color: '#d4d4d4', fontFamily: 'monospace',
+      flexDirection: isMobile ? 'column' : 'row'
     },
     sidebar: {
-      width: '250px', backgroundColor: '#252526', display: 'flex', flexDirection: 'column',
-      borderRight: '1px solid #333'
+      width: isMobile ? '100%' : '250px',
+      backgroundColor: '#252526',
+      display: isMobile && !sidebarOpen ? 'none' : 'flex',
+      flexDirection: 'column',
+      borderRight: '1px solid #333',
+      position: isMobile ? 'absolute' : 'relative',
+      zIndex: isMobile ? 3000 : 'auto',
+      height: isMobile ? '100%' : 'auto',
+      overflowY: 'auto'
     },
     sidebarHeader: {
       padding: '15px', fontWeight: 'bold', borderBottom: '1px solid #333',
@@ -195,38 +215,70 @@ export default function CodingOverlay({ isVisible, onClose }) {
       padding: '10px', fontSize: '11px', textTransform: 'uppercase', color: '#666', marginTop: '10px'
     },
     mainContainer: {
-      flex: 1, display: 'flex', flexDirection: 'row', height: '100%'
+      flex: 1,
+      display: 'flex',
+      flexDirection: isMobile ? 'column' : 'row',
+      height: '100%',
+      overflow: 'hidden'
     },
     editorPanel: {
-      width: `${splitPosition}%`,
+      width: isMobile ? '100%' : `${splitPosition}%`,
+      height: isMobile ? '50%' : '100%',
       display: 'flex',
       flexDirection: 'column',
       backgroundColor: '#1e1e1e'
     },
     toolbar: {
-      height: '50px', backgroundColor: '#333333', display: 'flex', alignItems: 'center',
-      padding: '0 15px', borderBottom: '1px solid #1e1e1e', justifyContent: 'space-between'
+      minHeight: '50px',
+      backgroundColor: '#333333',
+      display: 'flex',
+      alignItems: 'center',
+      padding: isMobile ? '8px' : '0 15px',
+      borderBottom: '1px solid #1e1e1e',
+      justifyContent: 'space-between',
+      flexWrap: isMobile ? 'wrap' : 'nowrap',
+      gap: isMobile ? '8px' : '0'
     },
     btn: {
-      padding: '6px 14px', borderRadius: '3px', border: 'none', cursor: 'pointer',
-      marginRight: '10px', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase'
+      padding: isMobile ? '10px 16px' : '6px 14px',
+      borderRadius: '3px',
+      border: 'none',
+      cursor: 'pointer',
+      marginRight: isMobile ? '0' : '10px',
+      fontSize: isMobile ? '14px' : '12px',
+      fontWeight: 'bold',
+      textTransform: 'uppercase',
+      whiteSpace: 'nowrap'
     },
     divider: {
-      width: '4px',
+      width: isMobile ? '100%' : '4px',
+      height: isMobile ? '4px' : 'auto',
       backgroundColor: '#333',
-      cursor: 'col-resize',
+      cursor: isMobile ? 'row-resize' : 'col-resize',
       userSelect: 'none',
-      transition: isDragging ? 'none' : 'background-color 0.2s'
+      transition: isDragging ? 'none' : 'background-color 0.2s',
+      display: isMobile ? 'none' : 'block'
     },
     outputPanel: {
-      width: `${100 - splitPosition}%`,
+      width: isMobile ? '100%' : `${100 - splitPosition}%`,
+      height: isMobile ? '50%' : '100%',
       backgroundColor: '#111',
-      padding: '10px',
+      padding: isMobile ? '8px' : '10px',
       overflowY: 'auto',
-      fontSize: '13px',
+      fontSize: isMobile ? '11px' : '13px',
       fontFamily: '"Consolas", monospace',
       display: 'flex',
       flexDirection: 'column'
+    },
+    menuButton: {
+      padding: '8px 12px',
+      backgroundColor: '#4CAF50',
+      color: 'white',
+      border: 'none',
+      borderRadius: '3px',
+      cursor: 'pointer',
+      fontSize: '16px',
+      fontWeight: 'bold'
     }
   }
 
@@ -243,7 +295,24 @@ export default function CodingOverlay({ isVisible, onClose }) {
 
       {/* --- SIDEBAR --- */}
       <div style={styles.sidebar}>
-        <div style={styles.sidebarHeader}>RIT // TERMINAL</div>
+        <div style={{...styles.sidebarHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <span>RIT // TERMINAL</span>
+          {isMobile && (
+            <button
+              onClick={() => setSidebarOpen(false)}
+              style={{
+                backgroundColor: 'transparent',
+                color: 'white',
+                border: 'none',
+                fontSize: '20px',
+                cursor: 'pointer',
+                padding: '0 8px'
+              }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
 
         <div style={styles.sidebarSection}>Project Files</div>
         <div style={styles.sidebarItem} onClick={handleSave}>💾 Save to Disk</div>
@@ -275,25 +344,43 @@ export default function CodingOverlay({ isVisible, onClose }) {
         <div style={styles.editorPanel}>
           {/* Toolbar */}
           <div style={styles.toolbar}>
-            <div>
-              <span style={{color: '#888', marginRight: '10px'}}>STATUS:</span>
-              <span style={{color: loading ? 'yellow' : '#4CAF50'}}>
-                {loading ? 'BOOTING KERNEL...' : 'ONLINE'}
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              {isMobile && (
+                <button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  style={styles.menuButton}
+                >
+                  ☰
+                </button>
+              )}
+              {!isMobile && (
+                <div>
+                  <span style={{color: '#888', marginRight: '10px'}}>STATUS:</span>
+                  <span style={{color: loading ? 'yellow' : '#4CAF50'}}>
+                    {loading ? 'BOOTING KERNEL...' : 'ONLINE'}
+                  </span>
+                </div>
+              )}
             </div>
-            <div>
+            <div style={{ display: 'flex', gap: isMobile ? '8px' : '0', flexWrap: 'wrap' }}>
               <button
                 onClick={runCode}
                 disabled={loading}
                 style={{...styles.btn, backgroundColor: loading ? '#555' : '#4CAF50', color: 'white'}}
               >
-                ▶ RUN PROGRAM
+                ▶ {isMobile ? 'RUN' : 'RUN PROGRAM'}
               </button>
               <button
                 onClick={stopCode}
                 style={{...styles.btn, backgroundColor: '#FF9800', color: 'white'}}
               >
                 ⏹ STOP
+              </button>
+              <button
+                onClick={onClose}
+                style={{...styles.btn, backgroundColor: '#b71c1c', color: 'white'}}
+              >
+                {isMobile ? '✕' : 'EXIT'}
               </button>
             </div>
           </div>
