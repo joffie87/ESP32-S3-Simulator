@@ -226,7 +226,7 @@ export default function ESP32Board({ position = [0, 0, 0] }) {
               <meshToonMaterial color="#0a0a0a" />
             </mesh>
 
-            {/* Metal Pin */}
+            {/* Metal Pin - glows white when hovered */}
             <mesh
               position={[0, 0.2, 0]}
               userData={{ placementSurface: 'esp32-pin', pinNumber: pin.pinNumber, pinIndex: pin.index }}
@@ -245,12 +245,26 @@ export default function ESP32Board({ position = [0, 0, 0] }) {
             >
               <boxGeometry args={[0.025, 0.3, 0.025]} />
               <meshToonMaterial
-                color={isPinHigh ? '#ff3333' : '#ffcc00'}
+                color={isPinHigh ? '#ff3333' : (isHovered ? '#ffffff' : '#ffcc00')}
                 emissive={isPinHigh ? '#ff0000' : (isHovered ? '#ffffff' : '#000000')}
-                emissiveIntensity={isPinHigh ? 1 : (isHovered ? 0.5 : 0)}
+                emissiveIntensity={isPinHigh ? 1 : (isHovered ? 3.0 : 0)}
               />
-              <Outlines thickness={isHovered ? 0.015 : 0.005} color={isHovered ? '#ffffff' : 'black'} />
+              <Outlines thickness={0.005} color="black" />
             </mesh>
+
+            {/* Blue cylinder indicator when hovered - transparent shell around pin */}
+            {isHovered && (
+              <mesh position={[0, 0.2, 0]}>
+                <cylinderGeometry args={[0.1, 0.1, 0.15, 16]} />
+                <meshStandardMaterial
+                  color="#4444ff"
+                  transparent
+                  opacity={0.7}
+                  emissive="#4444ff"
+                  emissiveIntensity={0.5}
+                />
+              </mesh>
+            )}
 
             {/* Invisible larger hitbox for easier wire attachment */}
             <mesh

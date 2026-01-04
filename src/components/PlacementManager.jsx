@@ -7,13 +7,14 @@ import Wire from './Wire'
 import * as THREE from 'three'
 
 export default function PlacementManager() {
-  const { isEditMode, selectedItem, addComponent, startWire, completeWire, wireInProgress, cancelWire, setHoveredPinInfo, placedComponents } = useCoding()
+  const { isEditMode, selectedItem, addComponent, startWire, completeWire, wireInProgress, cancelWire, setHoveredPinInfoDirect, placedComponents } = useCoding()
   const [ghostPosition, setGhostPosition] = useState([0, 0, 0])
   const [showGhost, setShowGhost] = useState(false)
   const { camera, gl, scene } = useThree()
   const raycaster = useRef(new THREE.Raycaster())
   const mouse = useRef(new THREE.Vector2())
   const clickPending = useRef(false)
+  const lastHoveredPinInfo = useRef(null) // Track previous hover to avoid unnecessary updates
 
   useFrame(() => {
     if (!isEditMode || !selectedItem) {
@@ -68,12 +69,13 @@ export default function PlacementManager() {
           console.log('[PlacementManager] ✓ Found valid pin:', pinInfo)
           validIntersect = intersect
 
-          // Update hover info for tooltip
+          // Update hover info for tooltip - only if it changed
+          let newHoverInfo = null
           if (pinInfo.type === 'esp32') {
             // Check if this is a ground pin
             const isGround = pinInfo.pinNumber === 1 || pinInfo.pinNumber === 2 ||
                            pinInfo.pinNumber === 38 || pinInfo.pinNumber === 39
-            setHoveredPinInfo(isGround ? `pin (${pinInfo.pinNumber}) GND` : `pin (${pinInfo.pinNumber})`)
+            newHoverInfo = isGround ? `pin (${pinInfo.pinNumber}) GND` : `pin (${pinInfo.pinNumber})`
           } else {
             // Find component to get color/type info
             const component = placedComponents.find(c => c.id === pinInfo.componentId)
@@ -82,15 +84,21 @@ export default function PlacementManager() {
                 const colorName = component.props.color === '#ff0000' ? 'red' :
                                   component.props.color === '#00ff00' ? 'green' : 'yellow'
                 const pinNum = pinInfo.pinType === 'cathode' ? '0' : '1'
-                setHoveredPinInfo(`${colorName} led (${pinNum})`)
+                newHoverInfo = `${colorName} led (${pinNum})`
               } else if (component.type === 'button') {
                 const pinNum = pinInfo.pinType === 'terminal-1' ? '0' : '1'
-                setHoveredPinInfo(`button (${pinNum})`)
+                newHoverInfo = `button (${pinNum})`
               }
             } else {
               // Fallback if component not found
-              setHoveredPinInfo(`${pinInfo.componentType || 'component'} pin`)
+              newHoverInfo = `${pinInfo.componentType || 'component'} pin`
             }
+          }
+
+          // Only update if hover info changed
+          if (newHoverInfo !== lastHoveredPinInfo.current) {
+            lastHoveredPinInfo.current = newHoverInfo
+            setHoveredPinInfoDirect(newHoverInfo)
           }
           break
         }
@@ -99,7 +107,10 @@ export default function PlacementManager() {
 
     // Clear hover info if no valid pin found
     if (!validIntersect && selectedItem === 'wire') {
-      setHoveredPinInfo(null)
+      if (lastHoveredPinInfo.current !== null) {
+        lastHoveredPinInfo.current = null
+        setHoveredPinInfoDirect(null)
+      }
     }
 
     if (validIntersect) {
@@ -223,12 +234,9 @@ export default function PlacementManager() {
           componentType = 'button'
         }
 
-        // Transform world position to local position (for rotated group)
-        const localPosition = [
-          -ghostPosition[0],
-          ghostPosition[1],
-          -ghostPosition[2]
-        ]
+        // COORDINATE SPACE UNIFIED: World space now matches component space
+        // No transformation needed - use ghostPosition directly
+        const localPosition = [...ghostPosition]
 
         console.log('[PlacementManager] Placing component:', componentType)
         addComponent(componentType, localPosition, props)

@@ -381,100 +381,79 @@ export default function Level() {
         {/* ================================================================
             SHOP BUILDING - Your repair shop (imported component)
             Rotated 180° so window faces the player
-            Includes workbench and electronics inside for proper positioning
+            Wrapped in its own rotation group
             ================================================================ */}
         <group rotation={[0, Math.PI, 0]}>
           <ShopBuilding position={[0, 0, 0]} />
-
-          {/* ================================================================
-              WORKBENCH AND ELECTRONICS - The interactive workspace
-              ================================================================ */}
-
-          {/*
-            Workbench - The table surface
-            Moved back from window to z=4.0 (1.5 units from window sill)
-            Height y=1.35 sits on shop floor
-            Wrapped in Draggable for drag-and-drop functionality
-          */}
-          <Draggable position={[0, 1.35, 4.0]}>
-            <Workbench />
-          </Draggable>
-
-          {/*
-            ESP32 Board - The microcontroller you'll program
-            Scaled to 17% (0.17) to be ~1/3 the workbench size
-            Rotated lengthwise (90 degrees on Y axis)
-            Positioned on left side of workbench, sitting on surface at y=1.5
-            Wrapped in Draggable for drag-and-drop functionality
-          */}
-          <Draggable position={[-0.4, 1.5, 4.0]}>
-            <group rotation={[0, Math.PI / 2, 0]} scale={0.17}>
-              <ESP32Board />
-            </group>
-          </Draggable>
-
-          {/*
-            Breadboard - Where you plug in components
-            Scaled to 60% (0.6) to match ESP32 size
-            Positioned on right side of workbench, sitting on surface at y=1.49
-            Wrapped in Draggable for drag-and-drop functionality
-          */}
-          <Draggable position={[0.5, 1.49, 4.0]}>
-            <group scale={0.6}>
-              <Breadboard />
-            </group>
-          </Draggable>
-
-          {/*
-            LED Component - Light that turns on/off
-            Scaled to 60% (0.6) to match other components
-            Positioned ON the breadboard at left side
-            Must be wired to an ESP32 pin to work
-            color="#ff0000" = red LED
-            Wrapped in Draggable for drag-and-drop functionality
-          */}
-          <Draggable position={[0.3, 1.52, 4.0]}>
-            <group scale={0.6}>
-              <ComponentLED componentId="default-led" color="#ff0000" />
-            </group>
-          </Draggable>
-
-          {/*
-            Button Component - Clickable input button
-            Scaled to 60% (0.6) to match other components
-            Positioned ON the breadboard at right side
-            connectedPin={0} means pressing it sends signal to GPIO pin 0
-            Wrapped in Draggable for drag-and-drop functionality
-          */}
-          <Draggable position={[0.7, 1.52, 4.0]}>
-            <group scale={0.6}>
-              <ComponentButton connectedPin={0} />
-            </group>
-          </Draggable>
-
-          {/* ================================================================
-              PLACED COMPONENTS - Dynamically placed items in Creative Mode
-              Right-click to delete in edit mode
-              ================================================================ */}
-          {placedComponents.map((component) => (
-            <Draggable key={component.id} position={component.position} componentId={component.id}>
-              <group scale={0.6}>
-                {component.type === 'led' && (
-                  <ComponentLED
-                    componentId={component.id}
-                    color={component.props.color || '#ff0000'}
-                  />
-                )}
-                {component.type === 'button' && (
-                  <ComponentButton
-                    componentId={component.id}
-                  />
-                )}
-              </group>
-            </Draggable>
-          ))}
-
         </group>
+
+        {/* ================================================================
+            WORKBENCH AND ELECTRONICS - The interactive workspace
+            COORDINATE SPACE: Now in unified world space (transforms baked)
+            ================================================================ */}
+
+        {/*
+          Workbench - The table surface
+          Transform baked: position [0, 1.35, 4.0] → [0, 1.35, -4.0]
+          Rotation baked: added [0, Math.PI, 0]
+          Height y=1.35 sits on shop floor
+          Wrapped in Draggable for drag-and-drop functionality
+        */}
+        <Draggable position={[0, 1.35, -4.0]} rotation={[0, Math.PI, 0]}>
+          <Workbench />
+        </Draggable>
+
+        {/*
+          ESP32 Board - The microcontroller you'll program
+          Transform baked: position [-0.4, 1.5, 4.0] → [0.4, 1.5, -4.0]
+          Rotation baked: [0, π/2, 0] + π = [0, -π/2, 0]
+          Scaled to 17% (0.17) to be ~1/3 the workbench size
+          Positioned on left side of workbench, sitting on surface at y=1.5
+          Wrapped in Draggable for drag-and-drop functionality
+        */}
+        <Draggable position={[0.4, 1.5, -4.0]} rotation={[0, -Math.PI / 2, 0]}>
+          <group scale={0.17}>
+            <ESP32Board />
+          </group>
+        </Draggable>
+
+        {/*
+          Breadboard - Where you plug in components
+          Transform baked: position [0.5, 1.49, 4.0] → [-0.5, 1.49, -4.0]
+          Rotation baked: added [0, Math.PI, 0]
+          Scaled to 60% (0.6) to match ESP32 size
+          Positioned on right side of workbench, sitting on surface at y=1.49
+          Wrapped in Draggable for drag-and-drop functionality
+        */}
+        <Draggable position={[-0.5, 1.49, -4.0]} rotation={[0, Math.PI, 0]}>
+          <group scale={0.6}>
+            <Breadboard />
+          </group>
+        </Draggable>
+
+        {/* ================================================================
+            PLACED COMPONENTS - All dynamically placed items including defaults
+            Right-click to delete in edit mode
+            Transform baked: rotation [0, Math.PI, 0] applied to each
+            Initial components (default-led, default-button) now in state
+            ================================================================ */}
+        {placedComponents.map((component) => (
+          <Draggable key={component.id} position={component.position} componentId={component.id} rotation={[0, Math.PI, 0]}>
+            <group scale={0.6}>
+              {component.type === 'led' && (
+                <ComponentLED
+                  componentId={component.id}
+                  color={component.props.color || '#ff0000'}
+                />
+              )}
+              {component.type === 'button' && (
+                <ComponentButton
+                  componentId={component.id}
+                />
+              )}
+            </group>
+          </Draggable>
+        ))}
 
         {/* ================================================================
             WIRES - Visual connections between pins

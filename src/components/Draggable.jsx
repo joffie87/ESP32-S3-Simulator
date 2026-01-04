@@ -8,6 +8,7 @@ import { useCoding } from '../CodingContext'
  *
  * Props:
  * - position: [x, y, z] initial position
+ * - rotation: [x, y, z] rotation in radians (default [0, 0, 0])
  * - children: The 3D object to make draggable
  * - componentId: ID of the component (for deletion)
  * - gridSize: Grid snapping increment (default 0.05)
@@ -20,6 +21,7 @@ import { useCoding } from '../CodingContext'
  */
 export default function Draggable({
   position = [0, 0, 0],
+  rotation = [0, 0, 0],
   children,
   componentId = null,
   gridSize = 0.05,
@@ -63,14 +65,10 @@ export default function Draggable({
       const worldPos = getWorldPosition(event.clientX, event.clientY)
 
       if (worldPos) {
-        // Transform to local space (building is rotated 180 degrees)
-        // A 180° rotation around Y-axis flips X and Z coordinates
-        const localX = -worldPos.x
-        const localZ = -worldPos.z
-
-        // Snap to grid
-        const snappedX = snapToGrid(localX)
-        const snappedZ = snapToGrid(localZ)
+        // COORDINATE SPACE UNIFIED: World space now matches component space
+        // No transformation needed - use world position directly
+        const snappedX = snapToGrid(worldPos.x)
+        const snappedZ = snapToGrid(worldPos.z)
 
         // Keep original Y position (will be lifted in render)
         setCurrentPosition([snappedX, position[1], snappedZ])
@@ -129,6 +127,7 @@ export default function Draggable({
     <group
       ref={groupRef}
       position={displayPosition}
+      rotation={rotation}
       onPointerDown={handlePointerDown}
       onContextMenu={handleContextMenu}
       onPointerOver={(e) => {

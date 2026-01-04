@@ -46,13 +46,29 @@ export function CodingProvider({ children }) {
 
   const [isCoding, setIsCoding] = useState(false)       // Is coding overlay open?
   const [isEditMode, setIsEditMode] = useState(false)   // Is edit mode active?
+  const [isFirstPerson, setIsFirstPerson] = useState(false) // Is first-person camera active?
   const [selectedItem, setSelectedItem] = useState(null) // Which tool is selected?
   const [virtualInput, setVirtualInput] = useState({ forward: 0, rightward: 0, jump: false }) // Mobile controls
-  const [placedComponents, setPlacedComponents] = useState([]) // Array of placed LEDs, buttons
+
+  // Initialize with default LED and button components
+  const [placedComponents, setPlacedComponents] = useState([
+    {
+      id: 'default-led',
+      type: 'led',
+      position: [-0.3, 1.52, -4.0],
+      props: { color: '#ff0000' }
+    },
+    {
+      id: 'default-button',
+      type: 'button',
+      position: [-0.7, 1.52, -4.0],
+      props: {}
+    }
+  ])
+
   const [wiring, setWiring] = useState({})              // Maps componentId → esp32Pin
   const [wires, setWires] = useState([])                // Array of visual wire objects
   const [wireInProgress, setWireInProgress] = useState(null) // Wire currently being placed
-  const [hoveredPinInfo, setHoveredPinInfo] = useState(null) // Tooltip text for hovered pin
 
   // ========================================================================
   // REFS: HIGH-PERFORMANCE DATA STORAGE (No re-renders)
@@ -94,6 +110,28 @@ export function CodingProvider({ children }) {
     }
   }).current
 
+  // ========================================================================
+  // HOVER INFO PUB/SUB SYSTEM (Isolated from context re-renders)
+  // ========================================================================
+
+  const hoveredPinInfoRef = useRef(null)         // Current hovered pin info (no re-renders)
+  const hoverInfoListeners = useRef(new Set())   // Set of callback functions subscribed to hover updates
+
+  // Update hover info without triggering context re-renders
+  const setHoveredPinInfoDirect = useRef((newInfo) => {
+    hoveredPinInfoRef.current = newInfo
+    // Notify only subscribed components (tooltip)
+    hoverInfoListeners.current.forEach(listener => listener())
+  }).current
+
+  // Subscribe to hover info changes (for tooltip)
+  const subscribeToHoverInfo = useRef((callback) => {
+    hoverInfoListeners.current.add(callback)
+    return () => {
+      hoverInfoListeners.current.delete(callback)
+    }
+  }).current
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isCoding) {
@@ -107,11 +145,16 @@ export function CodingProvider({ children }) {
           console.log('💡 Press 1-5 to select items. Ctrl+click to move placed objects.')
         }
       }
+      if (e.key === 'f' || e.key === 'F') {
+        const newFirstPerson = !isFirstPerson
+        setIsFirstPerson(newFirstPerson)
+        console.log('First-person mode:', newFirstPerson ? 'ON' : 'OFF')
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isCoding, isEditMode])
+  }, [isCoding, isEditMode, isFirstPerson])
 
   const setPinInput = (pin, value) => {
     console.log(`setPinInput called: pin=${pin}, value=${value}, worker=${workerRef.current ? 'ready' : 'not ready'}`)
@@ -276,6 +319,8 @@ export function CodingProvider({ children }) {
     setPinInput,
     isEditMode,
     setIsEditMode,
+    isFirstPerson,
+    setIsFirstPerson,
     virtualInput,
     setVirtualInput,
     selectedItem,
@@ -293,18 +338,19 @@ export function CodingProvider({ children }) {
     cancelWire,
     removeWireById,
     getComponentPin,
-    hoveredPinInfo,
-    setHoveredPinInfo
+    hoveredPinInfoRef, // Pass ref for hover info
+    setHoveredPinInfoDirect, // Direct update function (no context re-render)
+    subscribeToHoverInfo // Subscribe function for tooltip
   }), [
     isCoding,
     isEditMode,
+    isFirstPerson,
     virtualInput,
     selectedItem,
     placedComponents,
     wiring,
     wires,
-    wireInProgress,
-    hoveredPinInfo
+    wireInProgress
   ])
 
   return (

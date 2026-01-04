@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { KeyboardControls, Environment } from '@react-three/drei'
 import Level from './Level'
@@ -13,7 +13,23 @@ import useGamepad from './hooks/useGamepad'
 const MemoizedLevel = memo(Level)
 
 function AppContent() {
-  const { isCoding, setIsCoding, isEditMode, setVirtualInput, hoveredPinInfo } = useCoding()
+  const { isCoding, setIsCoding, isEditMode, setVirtualInput, hoveredPinInfoRef, subscribeToHoverInfo } = useCoding()
+
+  // Local state for hover tooltip - isolated from context
+  const [hoveredPinInfo, setHoveredPinInfo] = useState(null)
+
+  // Subscribe to hover info changes
+  useEffect(() => {
+    const updateHoverInfo = () => {
+      setHoveredPinInfo(hoveredPinInfoRef.current)
+    }
+
+    // Set initial value
+    updateHoverInfo()
+
+    // Subscribe to changes
+    return subscribeToHoverInfo(updateHoverInfo)
+  }, [hoveredPinInfoRef, subscribeToHoverInfo])
 
   // Handle mobile virtual controls
   const handleMobileMove = ({ forward, rightward }) => {

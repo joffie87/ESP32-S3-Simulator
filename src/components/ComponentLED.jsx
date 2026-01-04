@@ -116,17 +116,23 @@ export default function ComponentLED({ position = [0, 0, 0], componentId, connec
         >
           <cylinderGeometry args={[0.008, 0.008, 0.15, 6]} />
           <meshToonMaterial
-            color="#d0d0d0"
+            color={hoveredPin === 'cathode' ? '#ffffff' : '#d0d0d0'}
             emissive={hoveredPin === 'cathode' ? '#ffffff' : '#000000'}
-            emissiveIntensity={hoveredPin === 'cathode' ? 0.5 : 0}
+            emissiveIntensity={hoveredPin === 'cathode' ? 3.0 : 0}
           />
         </mesh>
 
-        {/* White outline when hovered */}
+        {/* Blue cylinder indicator when hovered - transparent shell around pin */}
         {hoveredPin === 'cathode' && (
           <mesh position={[-0.02, -0.05, 0]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.16, 6]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.5} />
+            <cylinderGeometry args={[0.06, 0.06, 0.15, 16]} />
+            <meshStandardMaterial
+              color="#4444ff"
+              transparent
+              opacity={0.7}
+              emissive="#4444ff"
+              emissiveIntensity={0.5}
+            />
           </mesh>
         )}
 
@@ -172,17 +178,23 @@ export default function ComponentLED({ position = [0, 0, 0], componentId, connec
         >
           <cylinderGeometry args={[0.008, 0.008, 0.15, 6]} />
           <meshToonMaterial
-            color="#d0d0d0"
+            color={hoveredPin === 'anode' ? '#ffffff' : '#d0d0d0'}
             emissive={hoveredPin === 'anode' ? '#ffffff' : '#000000'}
-            emissiveIntensity={hoveredPin === 'anode' ? 0.5 : 0}
+            emissiveIntensity={hoveredPin === 'anode' ? 3.0 : 0}
           />
         </mesh>
 
-        {/* White outline when hovered */}
+        {/* Blue cylinder indicator when hovered - transparent shell around pin */}
         {hoveredPin === 'anode' && (
           <mesh position={[0.02, -0.05, 0]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.16, 6]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.5} />
+            <cylinderGeometry args={[0.06, 0.06, 0.15, 16]} />
+            <meshStandardMaterial
+              color="#4444ff"
+              transparent
+              opacity={0.7}
+              emissive="#4444ff"
+              emissiveIntensity={0.5}
+            />
           </mesh>
         )}
 

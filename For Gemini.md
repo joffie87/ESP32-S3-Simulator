@@ -9,16 +9,18 @@ This document provides a comprehensive technical breakdown of the ESP32-S3 Simul
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Technology Stack](#technology-stack)
-3. [Architecture Patterns](#architecture-patterns)
-4. [Core Systems](#core-systems)
-5. [Performance Optimizations](#performance-optimizations)
-6. [Coordinate System & Transformations](#coordinate-system--transformations)
-7. [State Management Strategy](#state-management-strategy)
-8. [Python Integration (Pyodide)](#python-integration-pyodide)
-9. [3D Rendering Pipeline](#3d-rendering-pipeline)
-10. [Wiring System Implementation](#wiring-system-implementation)
-11. [Design Decisions & Trade-offs](#design-decisions--trade-offs)
+2. [Controls & User Interface](#controls--user-interface)
+3. [Technology Stack](#technology-stack)
+4. [Architecture Patterns](#architecture-patterns)
+5. [Core Systems](#core-systems)
+6. [Performance Optimizations](#performance-optimizations)
+7. [Coordinate System & Transformations](#coordinate-system--transformations)
+8. [State Management Strategy](#state-management-strategy)
+9. [Python Integration (Pyodide)](#python-integration-pyodide)
+10. [3D Rendering Pipeline](#3d-rendering-pipeline)
+11. [Wiring System Implementation](#wiring-system-implementation)
+12. [Design Decisions & Trade-offs](#design-decisions--trade-offs)
+13. [Known Issues](#known-issues)
 
 ---
 
@@ -38,6 +40,146 @@ Educational 3D simulator for ESP32-S3 microcontroller development, targeting nov
 
 ### Key Innovation
 **Zero hardware required** - Entire ESP32-S3 development workflow runs in browser with realistic visual feedback and actual Python code execution.
+
+---
+
+## Controls & User Interface
+
+### Movement Controls
+
+**Keyboard (PC)**:
+- **W/↑** - Move forward
+- **S/↓** - Move backward
+- **A/←** - Strafe left
+- **D/→** - Strafe right
+- **Space** - Jump
+- **Shift** - Sprint (hold while moving)
+- **Mouse** - Look around (first-person camera)
+
+**Gamepad Support**:
+- Left stick - Movement
+- Right stick - Camera look
+- A/Cross button - Jump
+- Triggers - Sprint
+
+**Mobile Touch Controls**:
+- Left virtual joystick - Movement
+- Right virtual joystick - Camera
+- Jump button - Jump
+
+### Edit Mode Controls
+
+**Toggle Edit Mode**: Press **G**
+- Enables component placement and wiring
+- Shows "EDIT MODE" indicator (top-left)
+- Displays inventory hotbar (bottom)
+
+**When in Edit Mode**:
+
+**Component Selection** (Number keys):
+- **1** - Red LED
+- **2** - Green LED
+- **3** - Yellow LED
+- **4** - Button (pushbutton switch)
+- **5** - Wire (for connecting components to ESP32 pins)
+
+**Component Placement**:
+1. Select item (1-5)
+2. Move mouse over breadboard
+3. Semi-transparent ghost preview appears
+4. Click to place component
+5. Press **G** to exit edit mode
+
+**Wire Tool** (Press 5):
+1. Select wire tool
+2. Hover over pins - blue cylinder indicator appears around pin
+3. Pin turns white and glows when hovered
+4. Tooltip shows pin info at top of screen
+5. Click first pin (ESP32 or component)
+6. Yellow preview wire follows cursor
+7. Click second pin to complete connection
+8. Wire renders as orange 3D cable with realistic curve
+
+**Component Management**:
+- **Ctrl + Drag** - Move placed components
+- **Right-click** - Delete component (also deletes connected wires)
+- **Right-click wire** - Delete individual wire connection
+
+**Exit Edit Mode**: Press **G** again
+
+### Coding Interface
+
+**Open Python Editor**: Walk up to workbench, press **E** when prompted
+- Opens full-screen Monaco editor (VS Code interface)
+- Pyodide loads (~2-3 seconds on first open)
+- Status shows "Ready" when Python environment loaded
+
+**Editor Controls**:
+- **Run button** (top-right) - Execute Python code
+- **Stop button** (top-right) - Interrupt running code
+- **Close button** (top-right) or **Escape** - Exit editor
+- Standard text editing (Ctrl+C/V/Z, etc.)
+
+**MicroPython API Available**:
+```python
+from machine import Pin
+
+# Create pin instance
+led = Pin(2, Pin.OUT)  # GPIO pin 2 as output
+
+# Control pin
+led.on()   # Set HIGH (3.3V) - LED lights up
+led.off()  # Set LOW (0V) - LED turns off
+led.value(1)  # Alternative: 1=HIGH, 0=LOW
+```
+
+### Visual Feedback
+
+**Pin Hover Indicators** (Wire tool active):
+- **Blue transparent cylinder** wraps around hovered pin
+- **Pin glows white** underneath cylinder
+- **Tooltip at top** shows pin info:
+  - ESP32: `pin (2)` or `pin (1) GND`
+  - LED: `red led (0)` or `red led (1)`
+  - Button: `button (0)` or `button (1)`
+
+**Component States**:
+- **LEDs**:
+  - OFF: Dark red/green/yellow (muted color)
+  - ON: Bright glowing color with point light
+- **Buttons**:
+  - Not pressed: Red button raised
+  - Pressed: Button depressed, sends HIGH signal to connected pin
+- **ESP32 Pins**:
+  - LOW: Yellow/gold color
+  - HIGH: Glowing red with point light
+
+**Ghost Previews**:
+- Semi-transparent component follows cursor when placing
+- Snaps to 0.05-unit grid (breadboard hole spacing)
+- Only appears over valid placement surfaces
+
+### UI Elements
+
+**Top-Left Indicators**:
+- **Green "EDIT MODE" badge** when edit mode active
+- Shows available actions: "Ctrl+drag to move | Right-click to delete | Press G to exit"
+
+**Top-Center Tooltip**:
+- Appears when hovering pins with wire tool
+- Shows pin number and type
+- Large white text on dark background
+
+**Bottom Inventory Hotbar** (Edit mode):
+- Shows 5 item slots with icons
+- Selected item highlighted
+- Click or use number keys (1-5) to select
+
+**Coding Overlay** (Press E at workbench):
+- Full-screen Python editor
+- Output terminal below code
+- Control buttons: Run, Stop, Close
+- Status indicator: Loading → Ready
 
 ---
 
@@ -141,19 +283,19 @@ App (CodingProvider wrapper)
 
 ### 3. Pub/Sub Pattern (Custom Implementation)
 
-**Problem Solved**: Avoiding cascade re-renders when pin states change rapidly.
+**Problem Solved**: Avoiding cascade re-renders when high-frequency data changes.
 
 **Traditional React Flow** (BAD):
 ```
-Pin changes → setState → Context updates → ALL consumers re-render
+Data changes → setState → Context updates → ALL consumers re-render
 ```
 
 **Our Pub/Sub Flow** (GOOD):
 ```
-Pin changes → Update ref (no render) → Notify subscribed listeners → Only subscribed components update
+Data changes → Update ref (no render) → Notify subscribed listeners → Only subscribed components update
 ```
 
-**Implementation**:
+**Implementation Example - Pin States**:
 ```javascript
 // CodingContext.jsx
 const pinStatesRef = useRef({})  // Data storage (no re-renders)
@@ -173,18 +315,47 @@ const subscribeToPinStates = useRef((callback) => {
 }).current
 ```
 
+**Implementation Example - Hover Tooltip** (Same Pattern):
+```javascript
+// CodingContext.jsx
+const hoveredPinInfoRef = useRef(null)
+const hoverInfoListeners = useRef(new Set())
+
+const setHoveredPinInfoDirect = useRef((newInfo) => {
+  hoveredPinInfoRef.current = newInfo
+  hoverInfoListeners.current.forEach(listener => listener())
+}).current
+
+const subscribeToHoverInfo = useRef((callback) => {
+  hoverInfoListeners.current.add(callback)
+  return () => hoverInfoListeners.current.delete(callback)
+}).current
+```
+
 **Components Subscribe**:
 ```javascript
-// ESP32Board.jsx, ComponentLED.jsx
+// ESP32Board.jsx, ComponentLED.jsx - Subscribe to pin states
 useEffect(() => {
   const updatePinStates = () => {
     setPinStates({ ...pinStatesRef.current })  // Local state update only
   }
   return subscribeToPinStates(updatePinStates)  // Subscribe on mount, unsubscribe on unmount
 }, [])
+
+// App.jsx - Subscribe to hover info
+useEffect(() => {
+  const updateHoverInfo = () => {
+    setHoveredPinInfo(hoveredPinInfoRef.current)
+  }
+  updateHoverInfo()
+  return subscribeToHoverInfo(updateHoverInfo)
+}, [hoveredPinInfoRef, subscribeToHoverInfo])
 ```
 
-**Result**: 40 pins updating at 60 FPS without app-wide re-renders.
+**Result**:
+- 40 pins updating at 60 FPS without app-wide re-renders
+- Hover tooltip updates without affecting 3D scene or player
+- Only subscribed components re-render when data changes
 
 ---
 
@@ -1076,7 +1247,103 @@ The combination of React, Three.js, and Pyodide proves that complex embedded sys
 
 ---
 
-**Document Version**: 1.0
+## Known Issues
+
+### Player Model Jiggling (Wire Tool Hover)
+
+**Status**: UNRESOLVED
+**Severity**: Medium (UX annoyance, not functionality-breaking)
+
+**Symptom**:
+When wire tool is active and cursor moves between pins, the player model jitters/jiggles slightly.
+
+**Root Cause Analysis**:
+Despite multiple architectural attempts to isolate hover info updates:
+1. ✅ Moved hover info to separate pub/sub system (like pin states)
+2. ✅ Only App.jsx subscribes (tooltip updates in isolation)
+3. ✅ Level component is memoized
+4. ✅ Context doesn't re-render on hover changes
+5. ❌ **Jiggle persists**
+
+**Hypothesis**:
+PlacementManager's local state updates (`ghostPosition`, `showGhost`) may be causing re-renders in the Level tree that affect the player component, even though they're in different branches. React Three Fiber may handle re-renders differently than standard React.
+
+**Attempted Solutions**:
+1. Separate HoverTooltipContext (didn't help)
+2. Pub/Sub isolation for hover info (didn't help)
+3. useMemo optimizations (already implemented)
+4. Comparison optimization (only update when value changes)
+
+**Current Workaround**: None - issue persists
+
+**Potential Future Solutions**:
+1. Move PlacementManager outside Level component entirely
+2. Use React Three Fiber portals for PlacementManager
+3. Implement custom raycasting outside React component tree
+4. Use zustand or similar external state manager
+5. Investigate React Three Fiber's internal reconciliation behavior
+
+**Impact on Users**:
+- Visual annoyance when hovering pins
+- Does not affect functionality
+- Does not affect placement accuracy
+- Does not occur when wire tool is not active
+
+### First-Person Camera Control
+
+**Status**: PARTIALLY IMPLEMENTED
+**Severity**: Low (nice-to-have feature)
+
+**Current Behavior**:
+- Third-person camera follows player
+- Camera controlled by mouse movement
+- No first-person toggle available
+
+**Requested Features** (not yet working):
+1. Press **F** to toggle first-person mode
+2. Camera should face forward at spawn (not at player back)
+3. Mouse-look without clicking
+4. Camera lock during edit mode operations
+
+**Attempted Solutions**:
+- Ecctrl props configuration (caused model disappearance)
+- Camera initialization parameters (didn't fix spawn direction)
+- Currently reverted to simple setup
+
+**Workaround**: Use current third-person camera (fully functional)
+
+### Component Limit Performance
+
+**Status**: DOCUMENTED LIMITATION
+**Severity**: Low (affects advanced users only)
+
+**Current Limits**:
+- ~50 placed components before noticeable FPS drop
+- ~20 active wires without performance degradation
+- Single Python execution thread
+
+**Mitigation**:
+- Educational use typically requires <10 components
+- Enough for all planned tutorial scenarios
+- Advanced users may notice slowdown
+
+**Future Optimization Opportunities**:
+- Object pooling for frequently placed components
+- Frustum culling for off-screen objects
+- Level-of-detail (LOD) system for distant components
+- Spatial partitioning for raycasting optimization
+
+---
+
+**Document Version**: 1.1
 **Last Updated**: 2026-01-04
 **Codebase Version**: Main branch
 **Primary Author**: AI-assisted development for educational purposes
+
+**Changelog**:
+- v1.1 (2026-01-04):
+  - Added "Controls & User Interface" section
+  - Updated Pub/Sub pattern to include hover info system
+  - Added "Known Issues" section documenting player jiggle
+  - Documented current control scheme completely
+- v1.0 (Initial version): Core architecture documentation
