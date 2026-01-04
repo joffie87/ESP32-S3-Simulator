@@ -106,15 +106,29 @@ function injectLoopSafety(code) {
 async function initializePyodide() {
   if (pyodide) return
 
-  self.postMessage({ type: 'STATUS', status: 'loading' })
+  try {
+    console.log('[Pyodide Worker] Starting initialization...')
+    self.postMessage({ type: 'STATUS', status: 'loading' })
 
-  pyodide = await loadPyodide({
-    indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/'
-  })
+    console.log('[Pyodide Worker] Loading Pyodide from CDN...')
+    pyodide = await loadPyodide({
+      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/'
+    })
 
-  pyodide.registerJsModule('machine', MachineModule)
+    console.log('[Pyodide Worker] Pyodide loaded successfully')
+    pyodide.registerJsModule('machine', MachineModule)
 
-  self.postMessage({ type: 'STATUS', status: 'ready' })
+    console.log('[Pyodide Worker] Machine module registered')
+    self.postMessage({ type: 'STATUS', status: 'ready' })
+    console.log('[Pyodide Worker] Initialization complete')
+  } catch (error) {
+    console.error('[Pyodide Worker] Initialization failed:', error)
+    self.postMessage({
+      type: 'ERROR',
+      error: `Failed to load Pyodide: ${error.message}`
+    })
+    self.postMessage({ type: 'STATUS', status: 'error' })
+  }
 }
 
 self.onmessage = async (event) => {

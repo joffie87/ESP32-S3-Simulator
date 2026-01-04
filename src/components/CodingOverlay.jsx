@@ -97,6 +97,9 @@ export default function CodingOverlay({ isVisible, onClose }) {
         if (type === 'STATUS' && status === 'ready') {
           setLoading(false)
           setOutput(prev => prev + '> System Ready.\n')
+        } else if (type === 'STATUS' && status === 'error') {
+          setLoading(false)
+          setOutput(prev => prev + '\n[FATAL ERROR]: Pyodide failed to load. Check console for details.\n')
         } else if (type === 'OUTPUT') {
           setOutput((prev) => prev + workerOutput)
         } else if (type === 'ERROR') {
