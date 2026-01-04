@@ -5,12 +5,34 @@ import Level from './Level'
 import { CodingProvider, useCoding } from './CodingContext'
 import CodingOverlay from './components/CodingOverlay'
 import Tutorial from './components/Tutorial'
+import MobileControls from './components/MobileControls'
+import useGamepad from './hooks/useGamepad'
 
 // Memoize Level to prevent re-renders when context updates (fixes player bounce glitch)
 const MemoizedLevel = memo(Level)
 
 function AppContent() {
-  const { isCoding, setIsCoding, isEditMode } = useCoding()
+  const { isCoding, setIsCoding, isEditMode, setVirtualInput } = useCoding()
+
+  // Handle mobile virtual controls
+  const handleMobileMove = ({ forward, rightward }) => {
+    setVirtualInput(prev => ({ ...prev, forward, rightward }))
+  }
+
+  const handleMobileJump = (isJumping) => {
+    setVirtualInput(prev => ({ ...prev, jump: isJumping }))
+  }
+
+  // Handle gamepad input
+  const handleGamepadInput = (input) => {
+    setVirtualInput({
+      forward: input.forward - input.backward,
+      rightward: input.rightward - input.leftward,
+      jump: input.jump
+    })
+  }
+
+  useGamepad(handleGamepadInput)
 
   return (
     <>
@@ -62,6 +84,9 @@ function AppContent() {
 
       {/* Tutorial and Control Hints */}
       <Tutorial />
+
+      {/* Mobile Touch Controls */}
+      <MobileControls onMove={handleMobileMove} onJump={handleMobileJump} />
     </>
   )
 }

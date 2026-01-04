@@ -6,6 +6,7 @@ export function CodingProvider({ children }) {
   const [isCoding, setIsCoding] = useState(false)
   const [pinStates, setPinStates] = useState({})
   const [isEditMode, setIsEditMode] = useState(false)
+  const [virtualInput, setVirtualInput] = useState({ forward: 0, rightward: 0, jump: false })
   const workerRef = useRef(null)
 
   useEffect(() => {
@@ -46,7 +47,9 @@ export function CodingProvider({ children }) {
       workerRef,
       setPinInput,
       isEditMode,
-      setIsEditMode
+      setIsEditMode,
+      virtualInput,
+      setVirtualInput
     }}>
       {children}
     </CodingContext.Provider>
