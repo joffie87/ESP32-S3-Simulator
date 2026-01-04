@@ -4,6 +4,7 @@ import { KeyboardControls, Environment } from '@react-three/drei'
 import Level from './Level'
 import { CodingProvider, useCoding } from './CodingContext'
 import CodingOverlay from './components/CodingOverlay'
+import Tutorial from './components/Tutorial'
 
 // Memoize Level to prevent re-renders when context updates (fixes player bounce glitch)
 const MemoizedLevel = memo(Level)
@@ -58,6 +59,9 @@ function AppContent() {
         isVisible={isCoding}
         onClose={() => setIsCoding(false)}
       />
+
+      {/* Tutorial and Control Hints */}
+      <Tutorial />
     </>
   )
 }

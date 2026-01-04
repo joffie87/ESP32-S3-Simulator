@@ -17,88 +17,7 @@ import { Outlines, RoundedBox } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-/**
- * DOOR COMPONENT - Functional swinging door
- * Uses kinematicPosition physics for smooth animation
- */
-function Door({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const doorRef = useRef()
-  const targetRotation = useRef(0)
-  const currentRotation = useRef(0)
-
-  const handleClick = (e) => {
-    e.stopPropagation()
-    setIsOpen(!isOpen)
-    // Swing 90 degrees inward
-    targetRotation.current = isOpen ? 0 : Math.PI / 2
-  }
-
-  useFrame(() => {
-    if (doorRef.current) {
-      const diff = targetRotation.current - currentRotation.current
-      if (Math.abs(diff) > 0.01) {
-        currentRotation.current += diff * 0.1
-        const quaternion = new THREE.Quaternion()
-        quaternion.setFromEuler(new THREE.Euler(0, currentRotation.current, 0))
-        doorRef.current.setNextKinematicRotation(quaternion)
-      }
-    }
-  })
-
-  return (
-    <group position={position} rotation={rotation}>
-      {/* Door Frame - Static black frame */}
-      {/* Left post */}
-      <mesh position={[0, 1.2, 0]} castShadow>
-        <boxGeometry args={[0.15, 2.4, 0.15]} />
-        <meshToonMaterial color="#2a2a2a" />
-      </mesh>
-      {/* Right post */}
-      <mesh position={[0, 1.2, 1]} castShadow>
-        <boxGeometry args={[0.15, 2.4, 0.15]} />
-        <meshToonMaterial color="#2a2a2a" />
-      </mesh>
-      {/* Top frame */}
-      <mesh position={[0, 2.4, 0.5]} castShadow>
-        <boxGeometry args={[0.15, 0.15, 1]} />
-        <meshToonMaterial color="#2a2a2a" />
-      </mesh>
-      {/* Bottom frame */}
-      <mesh position={[0, 0.2, 0.5]} castShadow>
-        <boxGeometry args={[0.15, 0.15, 1]} />
-        <meshToonMaterial color="#2a2a2a" />
-      </mesh>
-
-      {/* Door Panel - Hinged on one side */}
-      <RigidBody
-        ref={doorRef}
-        type="kinematicPosition"
-        position={[0, 1.2, 0.075]}
-        colliders="cuboid"
-      >
-        <group onClick={handleClick}>
-          <mesh position={[0, 0, 0.45]} castShadow>
-            <boxGeometry args={[0.1, 2.2, 0.9]} />
-            <meshToonMaterial color="#e8f4f8" />
-            <Outlines thickness={0.02} color="black" />
-          </mesh>
-
-          {/* Handle */}
-          <mesh position={[0.08, 0, 0.8]} rotation={[0, 0, Math.PI / 2]} castShadow>
-            <cylinderGeometry args={[0.03, 0.03, 0.15, 8]} />
-            <meshToonMaterial color="#ffcc00" />
-          </mesh>
-          <mesh position={[0.15, 0, 0.8]} castShadow>
-            <sphereGeometry args={[0.04, 8, 8]} />
-            <meshToonMaterial color="#ffcc00" />
-            <Outlines thickness={0.008} color="black" />
-          </mesh>
-        </group>
-      </RigidBody>
-    </group>
-  )
-}
+// Door component temporarily removed - will be reimplemented later
 
 /**
  * MAIN SHOP BUILDING COMPONENT
@@ -268,11 +187,7 @@ export default function ShopBuilding({ position = [0, 0, 0] }) {
         </RoundedBox>
       </mesh>
 
-      {/* ==================================================================
-          DOOR - Functional door on right wall (facing inward)
-          Position: right wall at x=5.7, aligned with door opening z=0 to z=1
-          ================================================================== */}
-      <Door position={[5.7, 0.2, 0.0]} rotation={[0, 0, 0]} />
+      {/* Door temporarily removed - will be reimplemented later */}
 
     </group>
   )
