@@ -63,7 +63,8 @@ while True:
 }
 
 export default function CodingOverlay({ isVisible, onClose }) {
-  const { pinStates, setPinStates, workerRef } = useCoding()
+  const { pinStatesRef, setPinStates, subscribeToPinStates, workerRef } = useCoding()
+  const [pinStates, setPinStatesLocal] = useState({})
   const [code, setCode] = useState(EXAMPLES['1. Basic Blink'])
   const [output, setOutput] = useState('')
   const [loading, setLoading] = useState(true)
@@ -73,6 +74,19 @@ export default function CodingOverlay({ isVisible, onClose }) {
   const [isMobile, setIsMobile] = useState(false)
   const fileInputRef = useRef(null)
   const containerRef = useRef(null)
+
+  // Subscribe to pin state changes for display
+  useEffect(() => {
+    const updatePinStates = () => {
+      setPinStatesLocal({ ...pinStatesRef.current })
+    }
+
+    // Initial state
+    updatePinStates()
+
+    // Subscribe to updates
+    return subscribeToPinStates(updatePinStates)
+  }, [pinStatesRef, subscribeToPinStates])
 
   // Detect mobile on mount and resize
   useEffect(() => {

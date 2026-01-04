@@ -9,16 +9,19 @@ import { useCoding } from '../CodingContext'
  * Props:
  * - position: [x, y, z] initial position
  * - children: The 3D object to make draggable
+ * - componentId: ID of the component (for deletion)
  * - gridSize: Grid snapping increment (default 0.05)
  * - hoverHeight: How high to lift when dragging (default 0.1)
  *
  * Usage:
  * - Press 'G' to toggle edit mode
- * - In edit mode, click and drag objects
+ * - In edit mode, Ctrl+click and drag objects
+ * - Right-click to delete placed components
  */
 export default function Draggable({
   position = [0, 0, 0],
   children,
+  componentId = null,
   gridSize = 0.05,
   hoverHeight = 0.1
 }) {
@@ -27,7 +30,7 @@ export default function Draggable({
   const groupRef = useRef()
   const dragStateRef = useRef({ isDragging: false })
   const { camera, gl, raycaster, size } = useThree()
-  const { isEditMode } = useCoding()
+  const { isEditMode, removeComponent } = useCoding()
 
   // Snap coordinate to grid
   const snapToGrid = (value) => {
@@ -60,9 +63,14 @@ export default function Draggable({
       const worldPos = getWorldPosition(event.clientX, event.clientY)
 
       if (worldPos) {
+        // Transform to local space (building is rotated 180 degrees)
+        // A 180° rotation around Y-axis flips X and Z coordinates
+        const localX = -worldPos.x
+        const localZ = -worldPos.z
+
         // Snap to grid
-        const snappedX = snapToGrid(worldPos.x)
-        const snappedZ = snapToGrid(worldPos.z)
+        const snappedX = snapToGrid(localX)
+        const snappedZ = snapToGrid(localZ)
 
         // Keep original Y position (will be lifted in render)
         setCurrentPosition([snappedX, position[1], snappedZ])
@@ -89,10 +97,28 @@ export default function Draggable({
   const handlePointerDown = (event) => {
     if (!isEditMode) return
 
+    // Right-click to delete (only for placed components with componentId)
+    if (event.button === 2 && componentId) {
+      event.stopPropagation()
+      console.log('[Draggable] 🗑️ Deleting component:', componentId)
+      removeComponent(componentId)
+      return
+    }
+
+    // Only allow dragging with Ctrl+click
+    if (!event.ctrlKey) return
+
     event.stopPropagation()
     dragStateRef.current.isDragging = true
     setIsDragging(true)
     gl.domElement.style.cursor = 'grabbing'
+  }
+
+  const handleContextMenu = (event) => {
+    // Prevent browser context menu in edit mode
+    if (isEditMode && componentId) {
+      event.stopPropagation()
+    }
   }
 
   // Calculate display position (lift while dragging)
@@ -104,10 +130,11 @@ export default function Draggable({
       ref={groupRef}
       position={displayPosition}
       onPointerDown={handlePointerDown}
+      onContextMenu={handleContextMenu}
       onPointerOver={(e) => {
         if (isEditMode) {
           e.stopPropagation()
-          gl.domElement.style.cursor = 'grab'
+          gl.domElement.style.cursor = componentId ? 'grab' : 'default'
         }
       }}
       onPointerOut={(e) => {

@@ -20,15 +20,15 @@ export default function Breadboard({ position = [0, 0, 0] }) {
   }
 
   return (
-    <group position={position} onClick={handleClick}>
-      <mesh position={[0, 0, 0]}>
+    <group position={position} onClick={handleClick} userData={{ placementSurface: 'breadboard' }}>
+      <mesh position={[0, 0, 0]} userData={{ placementSurface: 'breadboard' }}>
         <boxGeometry args={[1.6, 0.08, 0.6]} />
         <meshToonMaterial color="#eeeeee" />
         <Outlines thickness={0.015} color="black" />
       </mesh>
 
       {holes.map((hole, index) => (
-        <mesh key={index} position={[hole.x, 0.04, hole.z]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh key={index} position={[hole.x, 0.04, hole.z]} rotation={[Math.PI / 2, 0, 0]} userData={{ placementSurface: 'breadboard' }}>
           <cylinderGeometry args={[0.015, 0.015, 0.09, 6]} />
           <meshToonMaterial color="#1a1a1a" />
         </mesh>

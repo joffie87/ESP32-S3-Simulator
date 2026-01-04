@@ -18,7 +18,7 @@ export default function Workbench({ position = [0, 1, 0] }) {
     <RigidBody type="fixed" colliders="cuboid">
       <group onClick={handleClick}>
         {/* Table Top - Vibrant Blue Work Mat */}
-        <RoundedBox args={[2.5, 0.15, 1.2]} radius={0.02} smoothness={4} position={[0, 0, 0]}>
+        <RoundedBox args={[2.5, 0.15, 1.2]} radius={0.02} smoothness={4} position={[0, 0, 0]} userData={{ placementSurface: 'workbench' }}>
           <meshToonMaterial color="#3399ff" />
           <Outlines thickness={0.02} color="black" />
         </RoundedBox>

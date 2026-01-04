@@ -6,13 +6,14 @@ import { CodingProvider, useCoding } from './CodingContext'
 import CodingOverlay from './components/CodingOverlay'
 import Tutorial from './components/Tutorial'
 import MobileControls from './components/MobileControls'
+import Inventory from './components/Inventory'
 import useGamepad from './hooks/useGamepad'
 
 // Memoize Level to prevent re-renders when context updates (fixes player bounce glitch)
 const MemoizedLevel = memo(Level)
 
 function AppContent() {
-  const { isCoding, setIsCoding, isEditMode, setVirtualInput } = useCoding()
+  const { isCoding, setIsCoding, isEditMode, setVirtualInput, hoveredPinInfo } = useCoding()
 
   // Handle mobile virtual controls
   const handleMobileMove = ({ forward, rightward }) => {
@@ -50,6 +51,7 @@ function AppContent() {
           shadows
           camera={{ position: [0, 5, 10], fov: 50 }}
           style={{ width: '100vw', height: '100vh' }}
+          onContextMenu={(e) => e.preventDefault()}
         >
           <Environment preset="city" />
           <MemoizedLevel />
@@ -73,7 +75,31 @@ function AppContent() {
           boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
           border: '2px solid #45a049'
         }}>
-          🎯 EDIT MODE - Drag to move objects | Press G to exit
+          🎯 EDIT MODE - Ctrl+drag to move | Right-click to delete | Press G to exit
+        </div>
+      )}
+
+      {/* Hover Tooltip - Shows pin/component name when hovering */}
+      {hoveredPinInfo && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#333333',
+          color: '#ffffff',
+          padding: '16px 32px',
+          borderRadius: '12px',
+          fontFamily: 'monospace',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          zIndex: 1000,
+          boxShadow: '0 6px 12px rgba(0,0,0,0.6)',
+          border: '3px solid #ffffff',
+          pointerEvents: 'none',
+          letterSpacing: '1px'
+        }}>
+          {hoveredPinInfo}
         </div>
       )}
 
@@ -84,6 +110,9 @@ function AppContent() {
 
       {/* Tutorial and Control Hints */}
       <Tutorial />
+
+      {/* Creative Mode Inventory Hotbar */}
+      <Inventory />
 
       {/* Mobile Touch Controls */}
       <MobileControls onMove={handleMobileMove} onJump={handleMobileJump} />

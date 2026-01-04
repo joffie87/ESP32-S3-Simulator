@@ -38,6 +38,8 @@ import ComponentLED from './components/ComponentLED'
 import ComponentButton from './components/ComponentButton'
 import PlayerModel from './components/PlayerModel'
 import Draggable from './components/Draggable'
+import PlacementManager from './components/PlacementManager'
+import Wire from './components/Wire'
 import { useCoding } from './CodingContext'
 
 // ============================================================================
@@ -45,7 +47,7 @@ import { useCoding } from './CodingContext'
 // ============================================================================
 
 export default function Level() {
-  const { isEditMode } = useCoding()
+  const { isEditMode, placedComponents, wires } = useCoding()
 
   return (
     <>
@@ -427,13 +429,13 @@ export default function Level() {
             LED Component - Light that turns on/off
             Scaled to 60% (0.6) to match other components
             Positioned ON the breadboard at left side
-            connectedPin={2} means it's wired to GPIO pin 2 on the ESP32
+            Must be wired to an ESP32 pin to work
             color="#ff0000" = red LED
             Wrapped in Draggable for drag-and-drop functionality
           */}
           <Draggable position={[0.3, 1.52, 4.0]}>
             <group scale={0.6}>
-              <ComponentLED connectedPin={2} color="#ff0000" />
+              <ComponentLED componentId="default-led" color="#ff0000" />
             </group>
           </Draggable>
 
@@ -449,7 +451,52 @@ export default function Level() {
               <ComponentButton connectedPin={0} />
             </group>
           </Draggable>
+
+          {/* ================================================================
+              PLACED COMPONENTS - Dynamically placed items in Creative Mode
+              Right-click to delete in edit mode
+              ================================================================ */}
+          {placedComponents.map((component) => (
+            <Draggable key={component.id} position={component.position} componentId={component.id}>
+              <group scale={0.6}>
+                {component.type === 'led' && (
+                  <ComponentLED
+                    componentId={component.id}
+                    color={component.props.color || '#ff0000'}
+                  />
+                )}
+                {component.type === 'button' && (
+                  <ComponentButton
+                    componentId={component.id}
+                  />
+                )}
+              </group>
+            </Draggable>
+          ))}
+
         </group>
+
+        {/* ================================================================
+            WIRES - Visual connections between pins
+            IMPORTANT: Rendered OUTSIDE rotated group because wire positions
+            are captured in world space coordinates by PlacementManager
+            Right-click to delete wires in edit mode
+            ================================================================ */}
+        {wires.map((wire) => (
+          <Wire
+            key={wire.id}
+            wireId={wire.id}
+            startPos={wire.startPos}
+            endPos={wire.endPos}
+            color="#ff6600"
+          />
+        ))}
+
+        {/* ================================================================
+            PLACEMENT MANAGER - Handles ghost preview and placement
+            Works in world space (outside rotated group) for simplicity
+            ================================================================ */}
+        <PlacementManager />
 
         {/* ================================================================
             PLAYER CHARACTER - You! The person exploring the world

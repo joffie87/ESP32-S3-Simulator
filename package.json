@@ -19,7 +19,8 @@
     "pyodide": "^0.29.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "three": "^0.182.0"
+    "three": "^0.182.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
