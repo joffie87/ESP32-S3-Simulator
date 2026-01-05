@@ -105,6 +105,7 @@ export default function Tutorial() {
           <div><strong>MOUSE</strong> - Look</div>
           <div><strong>CLICK</strong> - Interact</div>
           <div><strong>G</strong> - Edit Mode</div>
+          <div><strong>ESC</strong> - Menu</div>
         </div>
       </div>
 

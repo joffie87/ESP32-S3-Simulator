@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react'
 import { useCoding } from '../CodingContext'
 import { Outlines, Text } from '@react-three/drei'
 
+/**
+ * PHASE 1 FIX: Entire component wrapped in rotation={[0, Math.PI, 0]}
+ * to ensure LED plugs into breadboard correctly in world space.
+ */
+
 export default function ComponentLED({ position = [0, 0, 0], componentId, connectedPin, color = '#ff0000' }) {
   const { pinStatesRef, subscribeToPinStates, getComponentPin, selectedItem, isEditMode } = useCoding()
   const [isOn, setIsOn] = useState(false)
@@ -76,6 +81,8 @@ export default function ComponentLED({ position = [0, 0, 0], componentId, connec
 
   return (
     <group position={position} onClick={handleClick}>
+      {/* Internal rotation fix - makes LED face correct direction */}
+      <group rotation={[0, Math.PI, 0]}>
       <mesh position={[0, 0.15, 0]}>
         <sphereGeometry args={[0.08, 8, 8]} />
         <meshToonMaterial
@@ -228,6 +235,8 @@ export default function ComponentLED({ position = [0, 0, 0], componentId, connec
           color={color}
         />
       )}
+      </group>
+      {/* End internal rotation fix */}
     </group>
   )
 }

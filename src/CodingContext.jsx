@@ -51,17 +51,18 @@ export function CodingProvider({ children }) {
   const [virtualInput, setVirtualInput] = useState({ forward: 0, rightward: 0, jump: false }) // Mobile controls
 
   // Initialize with default LED and button components
+  // Updated positions to match workbench at building center (Z=0)
   const [placedComponents, setPlacedComponents] = useState([
     {
       id: 'default-led',
       type: 'led',
-      position: [-0.3, 1.52, -4.0],
+      position: [-0.3, 1.52, 0],
       props: { color: '#ff0000' }
     },
     {
       id: 'default-button',
       type: 'button',
-      position: [-0.7, 1.52, -4.0],
+      position: [-0.7, 1.52, 0],
       props: {}
     }
   ])
@@ -326,12 +327,14 @@ export function CodingProvider({ children }) {
     selectedItem,
     setSelectedItem,
     placedComponents,
-    setPlacedComponents,
+    setPlacedComponents, // Exposed for GameMenu reset
     addComponent,
     removeComponent,
     updateComponentPosition,
     wiring,
+    setWiring, // Exposed for GameMenu reset
     wires,
+    setWires, // Exposed for GameMenu reset
     wireInProgress,
     startWire,
     completeWire,

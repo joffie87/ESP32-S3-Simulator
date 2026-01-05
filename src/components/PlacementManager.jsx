@@ -1,3 +1,15 @@
+/**
+ * ============================================================================
+ * PLACEMENTMANAGER.JSX - Smart Surface-Aware Placement System
+ * ============================================================================
+ *
+ * PHASE 1: Grid-based placement for breadboard
+ * - Detects smart surfaces (breadboard with grid system)
+ * - Converts world positions to grid coordinates
+ * - Snaps components to nearest valid grid position
+ * - Visual feedback with grid coordinates in console
+ */
+
 import { useState, useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useCoding } from '../CodingContext'
@@ -5,11 +17,13 @@ import ComponentLED from './ComponentLED'
 import ComponentButton from './ComponentButton'
 import Wire from './Wire'
 import * as THREE from 'three'
+import { localToGrid, gridToLocal, BREADBOARD_CONFIG } from './Breadboard'
 
 export default function PlacementManager() {
   const { isEditMode, selectedItem, addComponent, startWire, completeWire, wireInProgress, cancelWire, setHoveredPinInfoDirect, placedComponents } = useCoding()
   const [ghostPosition, setGhostPosition] = useState([0, 0, 0])
   const [showGhost, setShowGhost] = useState(false)
+  const [gridInfo, setGridInfo] = useState(null) // Track current grid position
   const { camera, gl, scene } = useThree()
   const raycaster = useRef(new THREE.Raycaster())
   const mouse = useRef(new THREE.Vector2())
@@ -48,8 +62,39 @@ export default function PlacementManager() {
       // LEDs and buttons can only be placed on breadboard
       if (selectedItem.startsWith('led-') || selectedItem === 'button') {
         if (surface === 'breadboard') {
-          console.log('[PlacementManager] ✓ Found valid breadboard placement at', intersect.point)
-          validIntersect = intersect
+          // PHASE 1: Smart Surface Detection
+          const isSmartSurface = intersect.object.userData?.smartSurface
+
+          if (isSmartSurface) {
+            // Convert world hit point to local space (relative to intersected object)
+            const localPoint = intersect.object.worldToLocal(intersect.point.clone())
+
+            // Convert local position to grid coordinates
+            const gridSnap = localToGrid(localPoint.x, localPoint.z)
+
+            console.log('[PlacementManager] 📍 Grid Snap:', {
+              row: gridSnap.row,
+              col: gridSnap.col,
+              isValid: gridSnap.isValid,
+              localPos: gridSnap.position
+            })
+
+            // Store grid info for placement
+            intersect.gridInfo = gridSnap
+
+            // Convert grid position back to world space for ghost preview
+            const [localX, localY, localZ] = gridSnap.position
+            const worldPos = intersect.object.localToWorld(new THREE.Vector3(localX, localY, localZ))
+
+            intersect.snappedPoint = worldPos
+            validIntersect = intersect
+            setGridInfo(gridSnap)
+          } else {
+            // Legacy: No grid snapping
+            console.log('[PlacementManager] ✓ Found valid breadboard placement at', intersect.point)
+            validIntersect = intersect
+            setGridInfo(null)
+          }
           break
         }
       }
@@ -114,14 +159,24 @@ export default function PlacementManager() {
     }
 
     if (validIntersect) {
-      // Get the intersection point in world space
-      const worldPoint = validIntersect.point
+      // Use snapped position if available (smart surface), otherwise use raw intersection
+      const worldPoint = validIntersect.snappedPoint || validIntersect.point
 
-      // Snap to 0.05 grid (breadboard hole spacing)
-      // Keep in world space for ghost preview
-      const snappedX = Math.round(worldPoint.x / 0.05) * 0.05
-      const snappedY = Math.round(worldPoint.y / 0.05) * 0.05 + 0.03 // Slight offset above surface
-      const snappedZ = Math.round(worldPoint.z / 0.05) * 0.05
+      // PHASE 1: Smart surfaces provide pre-snapped positions
+      // Legacy surfaces still use basic grid snapping
+      let snappedX, snappedY, snappedZ
+
+      if (validIntersect.snappedPoint) {
+        // Smart surface already calculated exact position
+        snappedX = worldPoint.x
+        snappedY = worldPoint.y + 0.03 // Slight visual offset above surface
+        snappedZ = worldPoint.z
+      } else {
+        // Legacy: Basic grid snapping
+        snappedX = Math.round(worldPoint.x / 0.05) * 0.05
+        snappedY = Math.round(worldPoint.y / 0.05) * 0.05 + 0.03
+        snappedZ = Math.round(worldPoint.z / 0.05) * 0.05
+      }
 
       setGhostPosition([snappedX, snappedY, snappedZ])
       if (!showGhost) {
@@ -129,7 +184,10 @@ export default function PlacementManager() {
         setShowGhost(true)
       }
     } else {
-      if (showGhost) setShowGhost(false)
+      if (showGhost) {
+        setShowGhost(false)
+        setGridInfo(null) // Clear grid info when not hovering valid surface
+      }
     }
   })
 

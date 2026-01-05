@@ -21,10 +21,15 @@ import * as THREE from 'three'
 
 /**
  * MAIN SHOP BUILDING COMPONENT
+ *
+ * PHASE 1 FIX: Wrapped entire building in rotation={[0, Math.PI, 0]}
+ * to correct default backward-facing orientation.
  */
 export default function ShopBuilding({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
+      {/* Internal rotation fix - makes building face +Z (forward) by default */}
+      <group rotation={[0, Math.PI, 0]}>
 
       {/* ==================================================================
           1. FLOOR - Concrete slab base (12×12)
@@ -189,6 +194,8 @@ export default function ShopBuilding({ position = [0, 0, 0] }) {
 
       {/* Door temporarily removed - will be reimplemented later */}
 
+      </group>
+      {/* End internal rotation fix */}
     </group>
   )
 }

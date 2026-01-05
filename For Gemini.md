@@ -55,6 +55,7 @@ Educational 3D simulator for ESP32-S3 microcontroller development, targeting nov
 - **Space** - Jump
 - **Shift** - Sprint (hold while moving)
 - **Mouse** - Look around (first-person camera)
+- **ESC** - Open game menu (reset, credits)
 
 **Gamepad Support**:
 - Left stick - Movement
@@ -180,6 +181,20 @@ led.value(1)  # Alternative: 1=HIGH, 0=LOW
 - Output terminal below code
 - Control buttons: Run, Stop, Close
 - Status indicator: Loading → Ready
+
+**Game Menu** (Press ESC):
+- **Main Menu**:
+  - Reset Simulation (with confirmation)
+  - Credits (development info & AI disclosure)
+  - Resume (or press ESC again)
+- **Reset Confirmation**:
+  - Warning about data loss
+  - Cancel / Confirm buttons
+- **Credits Screen**:
+  - Project information
+  - Technology stack
+  - AI development disclosure
+  - Close button (or ESC)
 
 ---
 

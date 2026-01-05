@@ -1,3 +1,9 @@
+/**
+ * WORKBENCH.JSX - Interactive work surface
+ *
+ * PHASE 1 FIX: Wrapped in rotation={[0, Math.PI, 0]} to face +Z by default.
+ */
+
 import { RigidBody } from '@react-three/rapier'
 import { RoundedBox, Outlines } from '@react-three/drei'
 import { useCoding } from '../CodingContext'
@@ -16,7 +22,9 @@ export default function Workbench({ position = [0, 1, 0] }) {
 
   return (
     <RigidBody type="fixed" colliders="cuboid">
-      <group onClick={handleClick}>
+      {/* Internal rotation fix - makes workbench face +Z (forward) by default */}
+      <group rotation={[0, Math.PI, 0]}>
+        <group onClick={handleClick}>
         {/* Table Top - Vibrant Blue Work Mat */}
         <RoundedBox args={[2.5, 0.15, 1.2]} radius={0.02} smoothness={4} position={[0, 0, 0]} userData={{ placementSurface: 'workbench' }}>
           <meshToonMaterial color="#3399ff" />
@@ -68,7 +76,9 @@ export default function Workbench({ position = [0, 1, 0] }) {
           <meshToonMaterial color="#bb7744" />
           <Outlines thickness={0.01} color="black" />
         </RoundedBox>
+        </group>
       </group>
+      {/* End internal rotation fix */}
     </RigidBody>
   )
 }

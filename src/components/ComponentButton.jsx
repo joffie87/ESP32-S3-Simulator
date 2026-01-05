@@ -1,3 +1,8 @@
+/**
+ * PHASE 1 FIX: Entire component wrapped in rotation={[0, Math.PI, 0]}
+ * to ensure button plugs into breadboard correctly in world space.
+ */
+
 import { useState } from 'react'
 import { useCoding } from '../CodingContext'
 import { Outlines, Text } from '@react-three/drei'
@@ -35,6 +40,8 @@ export default function ComponentButton({ position = [0, 0, 0], componentId, con
 
   return (
     <group position={position}>
+      {/* Internal rotation fix - makes button face correct direction */}
+      <group rotation={[0, Math.PI, 0]}>
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[0.12, 0.06, 0.12]} />
         <meshToonMaterial color="#2a2a2a" />
@@ -175,6 +182,8 @@ export default function ComponentButton({ position = [0, 0, 0], componentId, con
           <meshBasicMaterial transparent opacity={0} />
         </mesh>
       </group>
+      </group>
+      {/* End internal rotation fix */}
     </group>
   )
 }

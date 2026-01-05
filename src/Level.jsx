@@ -380,65 +380,47 @@ export default function Level() {
 
         {/* ================================================================
             SHOP BUILDING - Your repair shop (imported component)
-            Rotated 180° so window faces the player
-            Wrapped in its own rotation group
+            PHASE 2: Rotation removed - ShopBuilding handles orientation internally
             ================================================================ */}
-        <group rotation={[0, Math.PI, 0]}>
-          <ShopBuilding position={[0, 0, 0]} />
-        </group>
+        <ShopBuilding position={[0, 0, 0]} />
 
         {/* ================================================================
-            WORKBENCH AND ELECTRONICS - The interactive workspace
-            COORDINATE SPACE: Now in unified world space (transforms baked)
+            WORKBENCH STATION - The complete interactive workspace
+            PHASE 2: World space aligned - no external rotations needed
+            Everything grouped together to move as one unit in edit mode
             ================================================================ */}
 
         {/*
-          Workbench - The table surface
-          Transform baked: position [0, 1.35, 4.0] → [0, 1.35, -4.0]
-          Rotation baked: added [0, Math.PI, 0]
-          Height y=1.35 sits on shop floor
-          Wrapped in Draggable for drag-and-drop functionality
+          WORKBENCH STATION GROUP:
+          Contains: Workbench + ESP32Board + Breadboard
+          Position: [0, 1.35, 0] - Center of building
+          All child items use relative positioning (no individual Draggables)
         */}
-        <Draggable position={[0, 1.35, -4.0]} rotation={[0, Math.PI, 0]}>
-          <Workbench />
-        </Draggable>
+        <Draggable position={[0, 1.35, 0]}>
+          <group>
+            {/* Workbench - The table surface (at origin of this group) */}
+            <Workbench />
 
-        {/*
-          ESP32 Board - The microcontroller you'll program
-          Transform baked: position [-0.4, 1.5, 4.0] → [0.4, 1.5, -4.0]
-          Rotation baked: [0, π/2, 0] + π = [0, -π/2, 0]
-          Scaled to 17% (0.17) to be ~1/3 the workbench size
-          Positioned on left side of workbench, sitting on surface at y=1.5
-          Wrapped in Draggable for drag-and-drop functionality
-        */}
-        <Draggable position={[0.4, 1.5, -4.0]} rotation={[0, -Math.PI / 2, 0]}>
-          <group scale={0.17}>
-            <ESP32Board />
-          </group>
-        </Draggable>
+            {/* ESP32 Board - Relative position on workbench surface */}
+            <group position={[0.4, 0.15, 0]} scale={0.17} rotation={[0, -Math.PI / 2, 0]}>
+              <ESP32Board />
+            </group>
 
-        {/*
-          Breadboard - Where you plug in components
-          Transform baked: position [0.5, 1.49, 4.0] → [-0.5, 1.49, -4.0]
-          Rotation baked: added [0, Math.PI, 0]
-          Scaled to 60% (0.6) to match ESP32 size
-          Positioned on right side of workbench, sitting on surface at y=1.49
-          Wrapped in Draggable for drag-and-drop functionality
-        */}
-        <Draggable position={[-0.5, 1.49, -4.0]} rotation={[0, Math.PI, 0]}>
-          <group scale={0.6}>
-            <Breadboard />
+            {/* Breadboard - Relative position on workbench surface */}
+            <group position={[-0.5, 0.14, 0]} scale={0.6}>
+              <Breadboard />
+            </group>
           </group>
         </Draggable>
 
         {/* ================================================================
             PLACED COMPONENTS - All dynamically placed items including defaults
+            PHASE 2: Rotation removed - each component handles orientation internally
             Right-click to delete in edit mode
-            Transform baked: rotation [0, Math.PI, 0] applied to each
             Initial components (default-led, default-button) now in state
             ================================================================ */}
         {placedComponents.map((component) => (
-          <Draggable key={component.id} position={component.position} componentId={component.id} rotation={[0, Math.PI, 0]}>
+          <Draggable key={component.id} position={component.position} componentId={component.id}>
             <group scale={0.6}>
               {component.type === 'led' && (
                 <ComponentLED
@@ -457,8 +439,7 @@ export default function Level() {
 
         {/* ================================================================
             WIRES - Visual connections between pins
-            IMPORTANT: Rendered OUTSIDE rotated group because wire positions
-            are captured in world space coordinates by PlacementManager
+            PHASE 2: Always in world space - coordinates match placement 1:1
             Right-click to delete wires in edit mode
             ================================================================ */}
         {wires.map((wire) => (
@@ -473,25 +454,25 @@ export default function Level() {
 
         {/* ================================================================
             PLACEMENT MANAGER - Handles ghost preview and placement
-            Works in world space (outside rotated group) for simplicity
+            PHASE 2: Works in unified world space - 1:1 coordinate mapping
             ================================================================ */}
         <PlacementManager />
 
         {/* ================================================================
             PLAYER CHARACTER - You! The person exploring the world
+            PHASE 2: Rotation removed - Ecctrl works naturally in world space
             ================================================================ */}
 
         {/*
           Ecctrl = Character controller (handles walking, jumping, camera)
           position = Where player spawns (in front of shop window)
-          Wrapped in rotated group to face both camera and controls towards shop
+          PHASE 2: Position adjusted to -10 Z (front of building, window at +5.85 Z)
+          Player faces +Z direction (towards window) by default
         */}
-        <group rotation={[0, Math.PI, 0]}>
-          <Ecctrl position={[0, 0, 10]}>
-            {/* PlayerModel = The 3D character you see (tactical person with sunglasses) */}
-            <PlayerModel />
-          </Ecctrl>
-        </group>
+        <Ecctrl position={[0, 0, -10]}>
+          {/* PlayerModel = The 3D character you see (tactical person with sunglasses) */}
+          <PlayerModel />
+        </Ecctrl>
 
       </Physics>
       {/* End of Physics world */}

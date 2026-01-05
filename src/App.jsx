@@ -7,6 +7,7 @@ import CodingOverlay from './components/CodingOverlay'
 import Tutorial from './components/Tutorial'
 import MobileControls from './components/MobileControls'
 import Inventory from './components/Inventory'
+import GameMenu from './components/GameMenu'
 import useGamepad from './hooks/useGamepad'
 
 // Memoize Level to prevent re-renders when context updates (fixes player bounce glitch)
@@ -132,6 +133,9 @@ function AppContent() {
 
       {/* Mobile Touch Controls */}
       <MobileControls onMove={handleMobileMove} onJump={handleMobileJump} />
+
+      {/* Game Menu (ESC key) */}
+      <GameMenu />
     </>
   )
 }
