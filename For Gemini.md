@@ -58,7 +58,7 @@ Educational 3D simulator for ESP32-S3 microcontroller development, targeting nov
 - **Mouse Wheel** - Zoom between first-person (0) and third-person (up to 10 units)
 - **Click** - Lock mouse pointer for FPS controls
 - **ALT** - Unlock pointer for UI interaction (mouse mode)
-- **ESC** - Open game menu (reset, credits) or unlock pointer
+- **ESC** - Pause game and open menu (stops camera tracking, unlocks pointer)
 
 **Gamepad Support**:
 - Left stick - Movement
@@ -185,8 +185,15 @@ led.value(1)  # Alternative: 1=HIGH, 0=LOW
 - Control buttons: Run, Stop, Close
 - Status indicator: Loading → Ready
 
-**Game Menu** (Press ESC):
+**Game Menu** (Press ESC to Pause):
+- **Pause Behavior**:
+  - Camera stops tracking mouse movement
+  - Mouse wheel zoom disabled
+  - Pointer lock automatically released (cursor visible)
+  - Simulation paused (Python code continues but visual updates frozen)
+  - Press ESC again or click Resume to unpause
 - **Main Menu**:
+  - Settings (mouse sensitivity adjustment)
   - Reset Simulation (with confirmation)
   - Credits (development info & AI disclosure)
   - Resume (or press ESC again)
@@ -604,7 +611,63 @@ rigidBody.setRotation({ x: 0, y: newRot, z: 0, w: 1 }, true)
 // Spawn position Y=1.3 → feet at Y=0.51 (just above ground at Y=0)
 ```
 
-### 5. Pyodide Integration
+### 5. Pause System (Game Menu)
+
+**ESC Key Pause Functionality**:
+
+When user presses ESC, the game enters pause state similar to traditional games:
+
+**State Management**:
+```javascript
+// CodingContext.jsx
+const [isMenuOpen, setIsMenuOpen] = useState(false)
+// Shared across: GameMenu, Level (camera), App (pointer lock)
+```
+
+**What Gets Paused**:
+1. **Camera tracking** (Level.jsx):
+   ```javascript
+   if (isEditMode || isMouseMode || isMenuOpen) return
+   ```
+   Mouse movement no longer updates camera rotation
+
+2. **Mouse wheel zoom** (Level.jsx):
+   ```javascript
+   if (isEditMode || isMouseMode || isMenuOpen) return
+   ```
+   Scroll wheel disabled while paused
+
+3. **Pointer lock** (App.jsx):
+   ```javascript
+   if (isEditMode || isMouseMode || isCoding || isMenuOpen) {
+     document.exitPointerLock()  // Release mouse
+   }
+   ```
+   Cursor becomes visible for menu interaction
+
+4. **Crosshairs hidden** (App.jsx):
+   ```javascript
+   {!isEditMode && !isMouseMode && !isCoding && !isMenuOpen && (
+     <Crosshairs />
+   )}
+   ```
+
+**What Continues Running**:
+- Character physics (though no input affects camera)
+- Python code execution in Pyodide worker (if already running)
+- Pin state updates
+- 3D rendering (scene still visible)
+
+**Resume Flow**:
+1. User presses ESC again (or clicks Resume button)
+2. `setIsMenuOpen(false)` called
+3. Camera tracking re-enabled
+4. User clicks to re-lock pointer
+5. Gameplay continues
+
+**Design Pattern**: Uses same conditional checks as edit mode and mouse mode for consistency.
+
+### 6. Pyodide Integration
 
 **Web Worker Architecture**:
 ```
@@ -1472,12 +1535,19 @@ PlacementManager's local state updates (`ghostPosition`, `showGhost`) may be cau
 
 ---
 
-**Document Version**: 1.2
+**Document Version**: 1.3
 **Last Updated**: 2026-01-04
 **Codebase Version**: Main branch
 **Primary Author**: AI-assisted development for educational purposes
 
 **Changelog**:
+- v1.3 (2026-01-04):
+  - **New Feature**: Game pause system via ESC key
+  - Added Pause System section (Core Systems #5) documenting pause behavior
+  - Updated Game Menu section with pause functionality details
+  - Updated control descriptions to reflect ESC pause behavior
+  - Documented what gets paused vs what continues running
+  - Added isMenuOpen state management documentation
 - v1.2 (2026-01-04):
   - **Major Update**: Documented complete FPS control system rewrite
   - Replaced Ecctrl with custom FPSCharacterController

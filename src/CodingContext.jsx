@@ -55,6 +55,7 @@ export function CodingProvider({ children }) {
   const [mouseSensitivity, setMouseSensitivity] = useState(1.5) // Mouse look sensitivity (0-2)
   const [isMouseMode, setIsMouseMode] = useState(false) // Alt key held for UI interaction
   const [isPointerLocked, setIsPointerLocked] = useState(false) // Is mouse pointer locked?
+  const [isMenuOpen, setIsMenuOpen] = useState(false) // Is game menu (ESC) open? Pauses simulation
 
   // Initialize with ESP32, Breadboard, LED, and button components
   // All objects now in placedComponents for unified transform system
@@ -610,6 +611,8 @@ export function CodingProvider({ children }) {
     setIsMouseMode,
     isPointerLocked,
     setIsPointerLocked,
+    isMenuOpen,
+    setIsMenuOpen,
     placedComponents,
     setPlacedComponents, // Exposed for GameMenu reset
     addComponent,
@@ -641,6 +644,7 @@ export function CodingProvider({ children }) {
     mouseSensitivity,
     isMouseMode,
     isPointerLocked,
+    isMenuOpen,
     placedComponents,
     wiring,
     wires,

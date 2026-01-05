@@ -66,7 +66,7 @@ export default function Tutorial() {
         style={{
           position: 'fixed',
           bottom: '20px',
-          right: '20px',
+          right: '140px',
           backgroundColor: '#4CAF50',
           color: 'white',
           border: 'none',
@@ -193,7 +193,7 @@ export default function Tutorial() {
         <div style={{
           position: 'fixed',
           bottom: '20px',
-          right: '20px',
+          right: '140px',
           display: 'flex',
           gap: '10px',
           zIndex: 1000

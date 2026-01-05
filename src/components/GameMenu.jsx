@@ -11,13 +11,21 @@ import { useState, useEffect } from 'react'
 import { useCoding } from '../CodingContext'
 
 export default function GameMenu() {
-  const { setPlacedComponents, setWires, setWiring, setPinStates, mouseSensitivity, setMouseSensitivity } = useCoding()
-  const [isOpen, setIsOpen] = useState(false)
+  const {
+    setPlacedComponents,
+    setWires,
+    setWiring,
+    setPinStates,
+    mouseSensitivity,
+    setMouseSensitivity,
+    isMenuOpen,
+    setIsMenuOpen
+  } = useCoding()
   const [showCredits, setShowCredits] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
 
-  // ESC key handler
+  // ESC key handler - Toggle menu and pause simulation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -28,14 +36,14 @@ export default function GameMenu() {
         } else if (showSettings) {
           setShowSettings(false)
         } else {
-          setIsOpen(prev => !prev)
+          setIsMenuOpen(prev => !prev)
         }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showCredits, showResetConfirm, showSettings])
+  }, [showCredits, showResetConfirm, showSettings, setIsMenuOpen])
 
   const handleReset = () => {
     setShowResetConfirm(true)
@@ -81,14 +89,14 @@ export default function GameMenu() {
     setWiring({})
     setPinStates({})
 
-    // Close all menus
+    // Close all menus and unpause
     setShowResetConfirm(false)
-    setIsOpen(false)
+    setIsMenuOpen(false)
 
     console.log('[GameMenu] 🔄 Simulation reset to initial state (including ESP32 and Breadboard)')
   }
 
-  if (!isOpen) return null
+  if (!isMenuOpen) return null
 
   const styles = {
     overlay: {
@@ -286,7 +294,7 @@ export default function GameMenu() {
 
           <div style={styles.creditsText}>
             <strong>Project Lead & Developer:</strong><br />
-            [Your Name/Handle]
+            [Johnathon Rhoades "Joffie87"]
           </div>
 
           <div style={styles.creditsText}>
@@ -427,7 +435,7 @@ export default function GameMenu() {
         </div>
         <button
           style={styles.closeButton}
-          onClick={() => setIsOpen(false)}
+          onClick={() => setIsMenuOpen(false)}
           onMouseEnter={(e) => e.target.style.borderColor = '#888888'}
           onMouseLeave={(e) => e.target.style.borderColor = '#555555'}
         >

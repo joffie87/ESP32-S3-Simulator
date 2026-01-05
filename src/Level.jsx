@@ -58,7 +58,8 @@ export default function Level() {
     updateComponent,
     removeComponent,
     mouseSensitivity,
-    isMouseMode
+    isMouseMode,
+    isMenuOpen
   } = useCoding()
 
   // Camera rotation state for mouse follow
@@ -66,11 +67,11 @@ export default function Level() {
   const mousePositionRef = useRef({ x: 0, y: 0 })
   const cameraDistanceRef = useRef(0) // 0 = first person, >0 = third person
 
-  // Auto-follow mouse camera (disabled in edit mode or when Alt is held)
+  // Auto-follow mouse camera (disabled in edit mode, mouse mode, or when menu is open)
   useEffect(() => {
     const handleMouseMove = (e) => {
-      // Don't follow mouse if in edit mode or mouse mode (Alt held)
-      if (isEditMode || isMouseMode) return
+      // Don't follow mouse if in edit mode, mouse mode (Alt held), or menu is open (paused)
+      if (isEditMode || isMouseMode || isMenuOpen) return
 
       // Calculate mouse movement delta
       const deltaX = e.movementX || 0
@@ -89,8 +90,8 @@ export default function Level() {
     }
 
     const handleWheel = (e) => {
-      // Don't zoom if in edit mode or mouse mode
-      if (isEditMode || isMouseMode) return
+      // Don't zoom if in edit mode, mouse mode, or menu is open (paused)
+      if (isEditMode || isMouseMode || isMenuOpen) return
 
       // Zoom in/out with mouse wheel
       const delta = e.deltaY * 0.01
@@ -103,7 +104,7 @@ export default function Level() {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('wheel', handleWheel)
     }
-  }, [isEditMode, isMouseMode, mouseSensitivity])
+  }, [isEditMode, isMouseMode, isMenuOpen, mouseSensitivity])
 
   // Player position ref for camera following (using ref to avoid re-renders)
   const playerPositionRef = useRef({ x: 0, y: 1.3, z: -10 })

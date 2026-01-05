@@ -8,6 +8,7 @@ import Tutorial from './components/Tutorial'
 import MobileControls from './components/MobileControls'
 import Inventory from './components/Inventory'
 import GameMenu from './components/GameMenu'
+import ScreenRecorder from './components/ScreenRecorder'
 import useGamepad from './hooks/useGamepad'
 
 // Memoize Level to prevent re-renders when context updates (fixes player bounce glitch)
@@ -25,7 +26,8 @@ function AppContent() {
     wireInProgress,
     isMouseMode,
     isPointerLocked,
-    setIsPointerLocked
+    setIsPointerLocked,
+    isMenuOpen
   } = useCoding()
 
   // Local state for hover tooltip - isolated from context
@@ -51,14 +53,14 @@ function AppContent() {
     }
 
     const handleClick = () => {
-      // Lock pointer when clicking canvas in normal gameplay mode
-      if (!isEditMode && !isMouseMode && !isCoding) {
+      // Lock pointer when clicking canvas in normal gameplay mode (not paused/editing)
+      if (!isEditMode && !isMouseMode && !isCoding && !isMenuOpen) {
         document.body.requestPointerLock()
       }
     }
 
-    // Auto-release pointer lock when entering edit/mouse/coding modes
-    if (isEditMode || isMouseMode || isCoding) {
+    // Auto-release pointer lock when entering edit/mouse/coding modes or opening menu (pause)
+    if (isEditMode || isMouseMode || isCoding || isMenuOpen) {
       if (document.pointerLockElement) {
         document.exitPointerLock()
       }
@@ -71,7 +73,7 @@ function AppContent() {
       document.removeEventListener('pointerlockchange', handlePointerLockChange)
       document.removeEventListener('click', handleClick)
     }
-  }, [isEditMode, isMouseMode, isCoding, setIsPointerLocked])
+  }, [isEditMode, isMouseMode, isCoding, isMenuOpen, setIsPointerLocked])
 
   // Handle mobile virtual controls
   const handleMobileMove = ({ forward, rightward }) => {
@@ -163,8 +165,8 @@ function AppContent() {
         </div>
       )}
 
-      {/* Crosshairs - Center screen aim point */}
-      {!isEditMode && !isMouseMode && !isCoding && (
+      {/* Crosshairs - Center screen aim point (hidden when paused) */}
+      {!isEditMode && !isMouseMode && !isCoding && !isMenuOpen && (
         <div style={{
           position: 'fixed',
           top: '50%',
@@ -238,6 +240,9 @@ function AppContent() {
 
       {/* Tutorial and Control Hints */}
       <Tutorial />
+
+      {/* Screen Recorder */}
+      <ScreenRecorder />
 
       {/* Creative Mode Inventory Hotbar */}
       <Inventory />
