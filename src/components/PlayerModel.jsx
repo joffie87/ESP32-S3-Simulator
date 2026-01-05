@@ -2,7 +2,7 @@ import { Outlines } from '@react-three/drei'
 
 export default function PlayerModel() {
   return (
-    <group>
+    <group name="player" userData={{ isPlayer: true }}>
       {/* HEAD */}
       <group position={[0, 0.65, 0]}>
         {/* Skin tone sphere */}

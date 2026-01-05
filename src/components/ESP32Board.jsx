@@ -35,7 +35,7 @@ import { useCoding } from '../CodingContext'
  * - useEffect: Runs code when something changes (like subscribing to pin updates)
  * - useRef: Stores data that doesn't cause re-renders (like the board object)
  */
-export default function ESP32Board({ position = [0, 0, 0] }) {
+export default function ESP32Board({ componentId, ...props }) {
   // ========================================================================
   // STATE AND CONTEXT (Data Storage)
   // ========================================================================
@@ -142,7 +142,7 @@ export default function ESP32Board({ position = [0, 0, 0] }) {
   const allPins = [...leftPins, ...rightPins]
 
   return (
-    <group position={position} ref={boardRef} onClick={handleClick} userData={{ placementSurface: 'esp32' }}>
+    <group ref={boardRef} onClick={handleClick} userData={{ placementSurface: 'esp32', componentId }} {...props}>
       {/* PCB - Main Board */}
       <RoundedBox args={[2.2, 0.1, 5]} radius={0.02} smoothness={4} position={[0, 0, 0]} userData={{ placementSurface: 'esp32' }}>
         <meshToonMaterial color="#2a4a2a" />

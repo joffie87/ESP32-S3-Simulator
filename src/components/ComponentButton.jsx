@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useCoding } from '../CodingContext'
 import { Outlines, Text } from '@react-three/drei'
 
-export default function ComponentButton({ position = [0, 0, 0], componentId, connectedPin }) {
+export default function ComponentButton({ componentId, connectedPin, ...props }) {
   const { setPinInput, selectedItem, isEditMode } = useCoding()
   const [isPressed, setIsPressed] = useState(false)
   const [hoveredPin, setHoveredPin] = useState(null)
@@ -39,7 +39,7 @@ export default function ComponentButton({ position = [0, 0, 0], componentId, con
   }
 
   return (
-    <group position={position}>
+    <group {...props}>
       {/* Internal rotation fix - makes button face correct direction */}
       <group rotation={[0, Math.PI, 0]}>
       <mesh position={[0, 0, 0]}>

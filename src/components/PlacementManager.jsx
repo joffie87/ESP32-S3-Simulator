@@ -24,10 +24,12 @@ export default function PlacementManager() {
   const [ghostPosition, setGhostPosition] = useState([0, 0, 0])
   const [showGhost, setShowGhost] = useState(false)
   const [gridInfo, setGridInfo] = useState(null) // Track current grid position
+  const [currentHoveredPin, setCurrentHoveredPin] = useState(null) // Track currently hovered pin for wire validation
   const { camera, gl, scene } = useThree()
   const raycaster = useRef(new THREE.Raycaster())
   const mouse = useRef(new THREE.Vector2())
   const clickPending = useRef(false)
+  const rightClickPending = useRef(false)
   const lastHoveredPinInfo = useRef(null) // Track previous hover to avoid unnecessary updates
 
   useFrame(() => {
@@ -114,6 +116,9 @@ export default function PlacementManager() {
           console.log('[PlacementManager] ✓ Found valid pin:', pinInfo)
           validIntersect = intersect
 
+          // Track currently hovered pin for wire validation
+          setCurrentHoveredPin(pinInfo)
+
           // Update hover info for tooltip - only if it changed
           let newHoverInfo = null
           if (pinInfo.type === 'esp32') {
@@ -156,6 +161,7 @@ export default function PlacementManager() {
         lastHoveredPinInfo.current = null
         setHoveredPinInfoDirect(null)
       }
+      setCurrentHoveredPin(null)
     }
 
     if (validIntersect) {
@@ -191,6 +197,19 @@ export default function PlacementManager() {
     }
   })
 
+  // ESC key handler for canceling wire placement
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && wireInProgress) {
+        console.log('[PlacementManager] ❌ Wire placement canceled (ESC)')
+        cancelWire()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [wireInProgress, cancelWire])
+
   // Attach event handlers to canvas
   useEffect(() => {
     const canvas = gl.domElement
@@ -206,24 +225,38 @@ export default function PlacementManager() {
     const handleClick = (e) => {
       if (!isEditMode || !selectedItem) return
 
-      console.log('[PlacementManager] Click detected, showGhost:', showGhost)
+      // Left click (button 0)
+      if (e.button === 0) {
+        console.log('[PlacementManager] Left-click detected, showGhost:', showGhost)
+        // Signal that we want to place a component on the next frame
+        clickPending.current = true
+      }
+    }
 
-      // Signal that we want to place a component on the next frame
-      // This ensures showGhost is up to date
-      clickPending.current = true
+    const handleContextMenu = (e) => {
+      if (!isEditMode || !selectedItem) return
+
+      // Right-click while wire tool is active
+      if (selectedItem === 'wire' && wireInProgress) {
+        e.preventDefault() // Prevent browser context menu
+        rightClickPending.current = true
+        console.log('[PlacementManager] Right-click detected (cancel wire)')
+      }
     }
 
     if (isEditMode && selectedItem) {
       console.log('[PlacementManager] Attaching event handlers for', selectedItem)
       canvas.addEventListener('pointermove', handlePointerMove)
-      canvas.addEventListener('click', handleClick)
+      canvas.addEventListener('pointerdown', handleClick)
+      canvas.addEventListener('contextmenu', handleContextMenu)
     }
 
     return () => {
       canvas.removeEventListener('pointermove', handlePointerMove)
-      canvas.removeEventListener('click', handleClick)
+      canvas.removeEventListener('pointerdown', handleClick)
+      canvas.removeEventListener('contextmenu', handleContextMenu)
     }
-  }, [isEditMode, selectedItem, gl, showGhost])
+  }, [isEditMode, selectedItem, gl, showGhost, wireInProgress])
 
   // Track the last valid intersect for click handling
   const lastValidIntersect = useRef(null)
@@ -236,6 +269,15 @@ export default function PlacementManager() {
     }
   }, [showGhost, isEditMode, selectedItem])
 
+  // Handle right-click cancel
+  useEffect(() => {
+    if (rightClickPending.current && wireInProgress) {
+      rightClickPending.current = false
+      console.log('[PlacementManager] ❌ Wire placement canceled (right-click)')
+      cancelWire()
+    }
+  }, [rightClickPending.current, wireInProgress, cancelWire])
+
   // Handle pending clicks in the render loop
   useEffect(() => {
     if (clickPending.current && showGhost && isEditMode && selectedItem) {
@@ -243,6 +285,12 @@ export default function PlacementManager() {
 
       // Handle wire placement differently
       if (selectedItem === 'wire') {
+        // IMPORTANT: Only allow wire attachment if currently hovering a valid pin
+        // This prevents accidental wire placement from stray clicks
+        if (!currentHoveredPin) {
+          console.log('[PlacementManager] ❌ Wire click rejected - not hovering a valid pin')
+          return
+        }
         // Find the pin we clicked on
         raycaster.current.setFromCamera(mouse.current, camera)
         const intersects = raycaster.current.intersectObjects(scene.children, true)
@@ -269,11 +317,12 @@ export default function PlacementManager() {
 
             if (!wireInProgress) {
               // Start new wire
-              console.log('[PlacementManager] 🔌 Starting new wire from pin:', pinInfo)
+              console.log('[PlacementManager] 🔌 WIRE STARTED from pin:', pinInfo)
+              console.log('[PlacementManager] 💡 Click another pin to complete, or press ESC/Right-click to cancel')
               startWire(pinInfo, ghostPosition)
             } else {
               // Complete wire
-              console.log('[PlacementManager] ✅ Completing wire to pin:', pinInfo)
+              console.log('[PlacementManager] ✅ WIRE COMPLETED to pin:', pinInfo)
               completeWire(pinInfo, ghostPosition)
             }
             break
@@ -300,7 +349,7 @@ export default function PlacementManager() {
         addComponent(componentType, localPosition, props)
       }
     }
-  }, [showGhost, clickPending.current, isEditMode, selectedItem, ghostPosition, addComponent, startWire, completeWire, wireInProgress, camera, scene, mouse])
+  }, [showGhost, clickPending.current, isEditMode, selectedItem, ghostPosition, addComponent, startWire, completeWire, wireInProgress, camera, scene, mouse, currentHoveredPin, cancelWire])
 
   // Render ghost preview with semi-transparent glowing geometry
   const renderGhost = () => {

@@ -93,7 +93,7 @@ export function isValidGridPosition(row, col) {
 // BREADBOARD COMPONENT
 // ============================================================================
 
-export default function Breadboard({ position = [0, 0, 0], componentId = 'breadboard-main' }) {
+export default function Breadboard({ componentId = 'breadboard-main', ...props }) {
   const holes = []
 
   // Generate hole positions using grid system
@@ -109,13 +109,13 @@ export default function Breadboard({ position = [0, 0, 0], componentId = 'breadb
   }
 
   return (
-    <group position={position} onClick={handleClick} userData={{
+    <group onClick={handleClick} userData={{
       placementSurface: 'breadboard',
       componentId: componentId,
       gridSize: BREADBOARD_CONFIG.PITCH,
       gridRows: BREADBOARD_CONFIG.ROWS,
       gridCols: BREADBOARD_CONFIG.COLS
-    }}>
+    }} {...props}>
       {/* Internal rotation fix - makes breadboard holes align with world space */}
       <group rotation={[0, Math.PI, 0]}>
       <mesh position={[0, 0, 0]} userData={{

@@ -7,7 +7,7 @@ import { Outlines, Text } from '@react-three/drei'
  * to ensure LED plugs into breadboard correctly in world space.
  */
 
-export default function ComponentLED({ position = [0, 0, 0], componentId, connectedPin, color = '#ff0000' }) {
+export default function ComponentLED({ componentId, connectedPin, color = '#ff0000', ...props }) {
   const { pinStatesRef, subscribeToPinStates, getComponentPin, selectedItem, isEditMode } = useCoding()
   const [isOn, setIsOn] = useState(false)
   const [hoveredPin, setHoveredPin] = useState(null)
@@ -80,7 +80,7 @@ export default function ComponentLED({ position = [0, 0, 0], componentId, connec
   const offColor = getOffColor(color)
 
   return (
-    <group position={position} onClick={handleClick}>
+    <group onClick={handleClick} {...props}>
       {/* Internal rotation fix - makes LED face correct direction */}
       <group rotation={[0, Math.PI, 0]}>
       <mesh position={[0, 0.15, 0]}>

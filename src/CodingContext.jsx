@@ -48,21 +48,47 @@ export function CodingProvider({ children }) {
   const [isEditMode, setIsEditMode] = useState(false)   // Is edit mode active?
   const [isFirstPerson, setIsFirstPerson] = useState(false) // Is first-person camera active?
   const [selectedItem, setSelectedItem] = useState(null) // Which tool is selected?
+  const [selectedId, setSelectedId] = useState(null)    // Which component is selected for transform?
+  const [transformMode, setTransformMode] = useState('translate') // Transform mode: translate/rotate/scale
+  const [gizmoModeActive, setGizmoModeActive] = useState(false) // Is gizmo/transform mode active?
   const [virtualInput, setVirtualInput] = useState({ forward: 0, rightward: 0, jump: false }) // Mobile controls
+  const [mouseSensitivity, setMouseSensitivity] = useState(1.5) // Mouse look sensitivity (0-2)
+  const [isMouseMode, setIsMouseMode] = useState(false) // Alt key held for UI interaction
+  const [isPointerLocked, setIsPointerLocked] = useState(false) // Is mouse pointer locked?
 
-  // Initialize with default LED and button components
-  // Updated positions to match workbench at building center (Z=0)
+  // Initialize with ESP32, Breadboard, LED, and button components
+  // All objects now in placedComponents for unified transform system
   const [placedComponents, setPlacedComponents] = useState([
+    {
+      id: 'esp32-board',
+      type: 'esp32',
+      position: [0.4, 1.5, 0],
+      rotation: [0, -Math.PI / 2, 0],
+      scale: 0.17,
+      props: {}
+    },
+    {
+      id: 'breadboard-main',
+      type: 'breadboard',
+      position: [-0.5, 1.49, 0],
+      rotation: [0, 0, 0],
+      scale: 0.6,
+      props: {}
+    },
     {
       id: 'default-led',
       type: 'led',
       position: [-0.3, 1.52, 0],
+      rotation: [0, 0, 0],
+      scale: 1,
       props: { color: '#ff0000' }
     },
     {
       id: 'default-button',
       type: 'button',
       position: [-0.7, 1.52, 0],
+      rotation: [0, 0, 0],
+      scale: 1,
       props: {}
     }
   ])
@@ -135,6 +161,11 @@ export function CodingProvider({ children }) {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Alt key for mouse mode (UI interaction)
+      if (e.key === 'Alt') {
+        setIsMouseMode(true)
+      }
+
       if (e.key === 'Escape' && isCoding) {
         setIsCoding(false)
       }
@@ -151,11 +182,67 @@ export function CodingProvider({ children }) {
         setIsFirstPerson(newFirstPerson)
         console.log('First-person mode:', newFirstPerson ? 'ON' : 'OFF')
       }
+
+      // Transform/Gizmo mode shortcuts (when in edit mode)
+      if (isEditMode) {
+        // Toggle gizmo mode with X key
+        if (e.key === 'x' || e.key === 'X') {
+          const newGizmoMode = !gizmoModeActive
+          setGizmoModeActive(newGizmoMode)
+          console.log('Gizmo mode:', newGizmoMode ? 'ON' : 'OFF')
+          if (!newGizmoMode) {
+            // Deselect when turning off gizmo mode
+            setSelectedId(null)
+          }
+        }
+
+        // Transform mode shortcuts (only when gizmo mode is active)
+        if (gizmoModeActive) {
+          if (e.key === 't' || e.key === 'T') {
+            setTransformMode('translate')
+            console.log('Transform mode: TRANSLATE')
+          }
+          if (e.key === 'r' || e.key === 'R') {
+            setTransformMode('rotate')
+            console.log('Transform mode: ROTATE')
+          }
+          if (e.key === 's' || e.key === 'S') {
+            setTransformMode('scale')
+            console.log('Transform mode: SCALE')
+          }
+
+          // Delete selected component (but protect core components)
+          if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+            e.preventDefault() // Prevent browser navigation on Backspace
+
+            // Protect ESP32 and Breadboard from deletion
+            if (selectedId === 'esp32-board' || selectedId === 'breadboard-main') {
+              console.log('[CodingContext] ⛔ Cannot delete core component:', selectedId)
+              return
+            }
+
+            console.log('[CodingContext] 🗑️ Deleting selected component:', selectedId)
+            removeComponent(selectedId)
+            setSelectedId(null)
+          }
+        }
+      }
+    }
+
+    const handleKeyUp = (e) => {
+      // Release Alt key (exit mouse mode)
+      if (e.key === 'Alt') {
+        setIsMouseMode(false)
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isCoding, isEditMode, isFirstPerson])
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [isCoding, isEditMode, isFirstPerson, selectedId, gizmoModeActive])
 
   const setPinInput = (pin, value) => {
     console.log(`setPinInput called: pin=${pin}, value=${value}, worker=${workerRef.current ? 'ready' : 'not ready'}`)
@@ -213,6 +300,190 @@ export function CodingProvider({ children }) {
     setPlacedComponents(prev =>
       prev.map(c => c.id === id ? { ...c, position: newPosition } : c)
     )
+  }
+
+  const updateComponent = (id, updates) => {
+    // Get the updated component data
+    let updatedComponent = null
+
+    setPlacedComponents(prev => {
+      const newComponents = prev.map(c => {
+        if (c.id === id) {
+          updatedComponent = { ...c, ...updates }
+          return updatedComponent
+        }
+        return c
+      })
+      return newComponents
+    })
+
+    console.log('[CodingContext] 🔄 Updated component:', id, updates)
+
+    // Update connected wires when component moves/rotates/scales
+    if (updatedComponent && (updates.position || updates.rotation || updates.scale)) {
+      updateConnectedWires(updatedComponent)
+    }
+  }
+
+  // Helper function to calculate pin world position based on component transform
+  const calculatePinPosition = (component, pinInfo) => {
+    if (!component) return null
+
+    const basePos = component.position || [0, 0, 0]
+    const rotation = component.rotation || [0, 0, 0]
+    let scale = component.scale
+
+    // Normalize scale to a number
+    if (typeof scale === 'number') {
+      // Already a number
+    } else if (Array.isArray(scale)) {
+      scale = scale[0] // Use x-scale as uniform scale
+    } else {
+      scale = 1
+    }
+
+    // Get local pin offset based on component type and pin info
+    let localOffset = [0, 0, 0]
+    let internalRotation = [0, 0, 0] // Some components have internal rotation fixes
+
+    switch (component.type) {
+      case 'esp32':
+        // ESP32 pins: left side (0-19) or right side (20-39)
+        if (pinInfo.pinNumber !== undefined) {
+          const pinNum = pinInfo.pinNumber
+          if (pinNum < 20) {
+            // Left side pins
+            localOffset = [-0.95, 0.2, -2.2 + (pinNum * 0.22)]
+          } else {
+            // Right side pins
+            const rightIndex = pinNum - 20
+            localOffset = [0.95, 0.2, -2.2 + (rightIndex * 0.22)]
+          }
+        }
+        break
+
+      case 'led':
+        // LED has internal rotation [0, Math.PI, 0] and scale wrapper of 0.6 in Level.jsx
+        internalRotation = [0, Math.PI, 0]
+        if (pinInfo.pinType === 'cathode') {
+          localOffset = [-0.02, -0.05, 0]
+        } else if (pinInfo.pinType === 'anode') {
+          localOffset = [0.02, -0.05, 0]
+        }
+        // Account for the 0.6 scale wrapper in Level.jsx
+        localOffset = localOffset.map(v => v * 0.6)
+        break
+
+      case 'button':
+        // Button has internal rotation [0, Math.PI, 0] and scale wrapper of 0.6 in Level.jsx
+        internalRotation = [0, Math.PI, 0]
+        if (pinInfo.pinType === 'terminal-1') {
+          localOffset = [-0.03, -0.05, 0]
+        } else if (pinInfo.pinType === 'terminal-2') {
+          localOffset = [0.03, -0.05, 0]
+        }
+        // Account for the 0.6 scale wrapper in Level.jsx
+        localOffset = localOffset.map(v => v * 0.6)
+        break
+
+      case 'breadboard':
+        // Breadboard pins would need grid calculation
+        // For now, use component center
+        localOffset = [0, 0, 0]
+        break
+
+      default:
+        localOffset = [0, 0, 0]
+    }
+
+    // Apply transformations: local offset → internal rotation → scale → component rotation → base position
+    // Using basic 3D rotation math (Euler angles)
+
+    // Step 1: Apply internal rotation to local offset
+    let transformed = [...localOffset]
+    if (internalRotation[1] !== 0) {
+      // Apply Y-axis rotation (most common for LED/Button)
+      const cos = Math.cos(internalRotation[1])
+      const sin = Math.sin(internalRotation[1])
+      const x = transformed[0] * cos + transformed[2] * sin
+      const z = -transformed[0] * sin + transformed[2] * cos
+      transformed = [x, transformed[1], z]
+    }
+
+    // Step 2: Apply component scale
+    transformed = transformed.map(v => v * scale)
+
+    // Step 3: Apply component rotation
+    // Rotate around Y-axis (most common rotation axis)
+    if (rotation[1] !== 0) {
+      const cos = Math.cos(rotation[1])
+      const sin = Math.sin(rotation[1])
+      const x = transformed[0] * cos + transformed[2] * sin
+      const z = -transformed[0] * sin + transformed[2] * cos
+      transformed = [x, transformed[1], z]
+    }
+
+    // Rotate around X-axis
+    if (rotation[0] !== 0) {
+      const cos = Math.cos(rotation[0])
+      const sin = Math.sin(rotation[0])
+      const y = transformed[1] * cos - transformed[2] * sin
+      const z = transformed[1] * sin + transformed[2] * cos
+      transformed = [transformed[0], y, z]
+    }
+
+    // Rotate around Z-axis
+    if (rotation[2] !== 0) {
+      const cos = Math.cos(rotation[2])
+      const sin = Math.sin(rotation[2])
+      const x = transformed[0] * cos - transformed[1] * sin
+      const y = transformed[0] * sin + transformed[1] * cos
+      transformed = [x, y, transformed[2]]
+    }
+
+    // Step 4: Add base position
+    const worldPos = [
+      basePos[0] + transformed[0],
+      basePos[1] + transformed[1],
+      basePos[2] + transformed[2]
+    ]
+
+    return worldPos
+  }
+
+  // Update wire positions when a component is transformed
+  const updateConnectedWires = (component) => {
+    if (!component) return
+
+    setWires(prev => {
+      const updatedWires = prev.map(wire => {
+        let needsUpdate = false
+        let newStartPos = wire.startPos
+        let newEndPos = wire.endPos
+
+        // Update start position if this component is the start
+        if (wire.startPin.componentId === component.id) {
+          newStartPos = calculatePinPosition(component, wire.startPin)
+          needsUpdate = true
+          console.log('[CodingContext] 🔌 Updating wire start position for:', component.id)
+        }
+
+        // Update end position if this component is the end
+        if (wire.endPin.componentId === component.id) {
+          newEndPos = calculatePinPosition(component, wire.endPin)
+          needsUpdate = true
+          console.log('[CodingContext] 🔌 Updating wire end position for:', component.id)
+        }
+
+        if (needsUpdate) {
+          return { ...wire, startPos: newStartPos, endPos: newEndPos }
+        }
+
+        return wire
+      })
+
+      return updatedWires
+    })
   }
 
   // Helper functions for wiring management
@@ -281,6 +552,7 @@ export function CodingProvider({ children }) {
   }
 
   const cancelWire = () => {
+    console.log('[Wiring] ❌ Wire placement canceled')
     setWireInProgress(null)
   }
 
@@ -326,11 +598,24 @@ export function CodingProvider({ children }) {
     setVirtualInput,
     selectedItem,
     setSelectedItem,
+    selectedId,
+    setSelectedId,
+    transformMode,
+    setTransformMode,
+    gizmoModeActive,
+    setGizmoModeActive,
+    mouseSensitivity,
+    setMouseSensitivity,
+    isMouseMode,
+    setIsMouseMode,
+    isPointerLocked,
+    setIsPointerLocked,
     placedComponents,
     setPlacedComponents, // Exposed for GameMenu reset
     addComponent,
     removeComponent,
     updateComponentPosition,
+    updateComponent,
     wiring,
     setWiring, // Exposed for GameMenu reset
     wires,
@@ -350,6 +635,12 @@ export function CodingProvider({ children }) {
     isFirstPerson,
     virtualInput,
     selectedItem,
+    selectedId,
+    transformMode,
+    gizmoModeActive,
+    mouseSensitivity,
+    isMouseMode,
+    isPointerLocked,
     placedComponents,
     wiring,
     wires,

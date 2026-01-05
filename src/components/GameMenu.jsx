@@ -11,10 +11,11 @@ import { useState, useEffect } from 'react'
 import { useCoding } from '../CodingContext'
 
 export default function GameMenu() {
-  const { setPlacedComponents, setWires, setWiring, setPinStates } = useCoding()
+  const { setPlacedComponents, setWires, setWiring, setPinStates, mouseSensitivity, setMouseSensitivity } = useCoding()
   const [isOpen, setIsOpen] = useState(false)
   const [showCredits, setShowCredits] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
   // ESC key handler
   useEffect(() => {
@@ -24,6 +25,8 @@ export default function GameMenu() {
           setShowCredits(false)
         } else if (showResetConfirm) {
           setShowResetConfirm(false)
+        } else if (showSettings) {
+          setShowSettings(false)
         } else {
           setIsOpen(prev => !prev)
         }
@@ -32,25 +35,45 @@ export default function GameMenu() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showCredits, showResetConfirm])
+  }, [showCredits, showResetConfirm, showSettings])
 
   const handleReset = () => {
     setShowResetConfirm(true)
   }
 
   const confirmReset = () => {
-    // Reset to initial state
+    // Reset to initial state - includes ESP32, Breadboard, LED, and Button
     setPlacedComponents([
+      {
+        id: 'esp32-board',
+        type: 'esp32',
+        position: [0.4, 1.5, 0],
+        rotation: [0, -Math.PI / 2, 0],
+        scale: 0.17,
+        props: {}
+      },
+      {
+        id: 'breadboard-main',
+        type: 'breadboard',
+        position: [-0.5, 1.49, 0],
+        rotation: [0, 0, 0],
+        scale: 0.6,
+        props: {}
+      },
       {
         id: 'default-led',
         type: 'led',
         position: [-0.3, 1.52, 0],
+        rotation: [0, 0, 0],
+        scale: 1,
         props: { color: '#ff0000' }
       },
       {
         id: 'default-button',
         type: 'button',
         position: [-0.7, 1.52, 0],
+        rotation: [0, 0, 0],
+        scale: 1,
         props: {}
       }
     ])
@@ -62,7 +85,7 @@ export default function GameMenu() {
     setShowResetConfirm(false)
     setIsOpen(false)
 
-    console.log('[GameMenu] 🔄 Simulation reset to initial state')
+    console.log('[GameMenu] 🔄 Simulation reset to initial state (including ESP32 and Breadboard)')
   }
 
   if (!isOpen) return null
@@ -306,12 +329,77 @@ export default function GameMenu() {
     )
   }
 
+  // Settings Screen
+  if (showSettings) {
+    return (
+      <div style={styles.overlay}>
+        <div style={styles.creditsBox}>
+          <div style={styles.creditsTitle}>⚙️ Settings</div>
+
+          <div style={{...styles.creditsText, marginBottom: '30px'}}>
+            <strong>Mouse Sensitivity</strong><br />
+            <div style={{marginTop: '15px', display: 'flex', alignItems: 'center', gap: '15px'}}>
+              <span style={{minWidth: '60px', color: '#888888'}}>Low</span>
+              <input
+                type="range"
+                min="0.1"
+                max="2"
+                step="0.1"
+                value={mouseSensitivity}
+                onChange={(e) => setMouseSensitivity(parseFloat(e.target.value))}
+                style={{
+                  flex: 1,
+                  height: '8px',
+                  borderRadius: '4px',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              />
+              <span style={{minWidth: '60px', color: '#888888', textAlign: 'right'}}>High</span>
+            </div>
+            <div style={{textAlign: 'center', marginTop: '10px', fontSize: '18px', color: '#4CAF50'}}>
+              {mouseSensitivity.toFixed(1)}x
+            </div>
+          </div>
+
+          <div style={styles.creditsText}>
+            <strong>Controls:</strong><br />
+            • Camera follows mouse automatically<br />
+            • Hold <strong>Alt</strong> to interact with UI<br />
+            • <strong>Edit Mode</strong> disables camera following
+          </div>
+
+          <button
+            style={styles.closeButton}
+            onClick={() => setShowSettings(false)}
+            onMouseEnter={(e) => e.target.style.borderColor = '#888888'}
+            onMouseLeave={(e) => e.target.style.borderColor = '#555555'}
+          >
+            Back (ESC)
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   // Main Menu
   return (
     <div style={styles.overlay}>
       <div style={styles.menu}>
         <div style={styles.title}>⚙️ Menu</div>
         <div style={styles.buttonContainer}>
+          <button
+            style={styles.button}
+            onClick={() => setShowSettings(true)}
+            onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#3a3a3a'
+              e.target.style.borderColor = '#666666'
+              e.target.style.transform = 'scale(1)'
+            }}
+          >
+            ⚙️ Settings
+          </button>
           <button
             style={styles.button}
             onClick={handleReset}

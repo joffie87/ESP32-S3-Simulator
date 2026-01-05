@@ -11,16 +11,20 @@ export default function Tutorial() {
       content: "Learn the basics in this quick tutorial. Click 'Start Tutorial' to begin!"
     },
     {
-      title: "Movement Controls",
-      content: "Use WASD or Arrow Keys to move around. Press SPACE to jump. Hold SHIFT to run faster."
+      title: "First-Person Controls",
+      content: "This is a first-person game! Move with WASD - forward always goes where you're looking. Press SPACE to jump and SHIFT to sprint."
     },
     {
-      title: "Camera Control",
-      content: "Move your mouse to look around. Explore the environment!"
+      title: "Camera & View",
+      content: "Move your mouse to look around. Scroll the mouse wheel to zoom between first-person and third-person views. Your movement always follows where you're looking!"
+    },
+    {
+      title: "UI Interaction",
+      content: "Click anywhere to lock your mouse for FPS controls. Press ALT to unlock mouse for clicking buttons and UI. Press ESC to open the menu."
     },
     {
       title: "Workbench Interaction",
-      content: "Walk up to the workbench (the brown table) and click on it to open the code editor."
+      content: "Walk up to the workbench (the brown table) and click on it to open the code editor. You'll need to hold ALT while clicking to interact with it."
     },
     {
       title: "Try the Examples",
@@ -28,11 +32,11 @@ export default function Tutorial() {
     },
     {
       title: "Edit Mode (Advanced)",
-      content: "Press G to enter Edit Mode - you can drag and reposition objects in the scene!"
+      content: "Press G to enter Edit Mode - you can place components, wire circuits, and transform objects! Use number keys 1-5 to select tools."
     },
     {
       title: "Tutorial Complete!",
-      content: "You're ready to start coding! Click the workbench to begin."
+      content: "You're ready to start coding! Hold ALT and click the workbench to begin."
     }
   ]
 
@@ -99,11 +103,13 @@ export default function Tutorial() {
       }}>
         <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>Controls</div>
         <div style={{ lineHeight: '1.6' }}>
-          <div><strong>WASD</strong> - Move</div>
+          <div><strong>WASD</strong> - Move (FPS)</div>
+          <div><strong>MOUSE</strong> - Look Around</div>
+          <div><strong>WHEEL</strong> - Zoom View</div>
+          <div><strong>CLICK</strong> - Lock Pointer</div>
+          <div><strong>ALT</strong> - UI Mode</div>
           <div><strong>SPACE</strong> - Jump</div>
-          <div><strong>SHIFT</strong> - Run</div>
-          <div><strong>MOUSE</strong> - Look</div>
-          <div><strong>CLICK</strong> - Interact</div>
+          <div><strong>SHIFT</strong> - Sprint</div>
           <div><strong>G</strong> - Edit Mode</div>
           <div><strong>ESC</strong> - Menu</div>
         </div>

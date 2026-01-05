@@ -192,6 +192,75 @@ export default function ShopBuilding({ position = [0, 0, 0] }) {
         </RoundedBox>
       </mesh>
 
+      {/* ==================================================================
+          INTERIOR WINDOWS - Small windows on back and side walls
+          ================================================================== */}
+
+      {/* Back wall window */}
+      <mesh position={[0, 3, -5.7]} castShadow>
+        <boxGeometry args={[1.5, 1, 0.1]} />
+        <meshToonMaterial color="#88ccff" transparent opacity={0.7} />
+        <Outlines thickness={0.02} color="black" />
+      </mesh>
+
+      {/* Left wall windows */}
+      <mesh position={[-5.7, 3, -2.5]} castShadow>
+        <boxGeometry args={[0.1, 1, 1.2]} />
+        <meshToonMaterial color="#88ccff" transparent opacity={0.7} />
+        <Outlines thickness={0.02} color="black" />
+      </mesh>
+      <mesh position={[-5.7, 3, 2.5]} castShadow>
+        <boxGeometry args={[0.1, 1, 1.2]} />
+        <meshToonMaterial color="#88ccff" transparent opacity={0.7} />
+        <Outlines thickness={0.02} color="black" />
+      </mesh>
+
+      {/* ==================================================================
+          WALL TEXTURE DETAILS - Horizontal bands to add depth
+          ================================================================== */}
+
+      {/* Horizontal trim bands on walls */}
+      <mesh position={[0, 1.5, -5.9]} castShadow>
+        <boxGeometry args={[12, 0.1, 0.15]} />
+        <meshToonMaterial color="#d0e0e8" />
+      </mesh>
+      <mesh position={[0, 3.5, -5.9]} castShadow>
+        <boxGeometry args={[12, 0.1, 0.15]} />
+        <meshToonMaterial color="#d0e0e8" />
+      </mesh>
+
+      {/* Corner trim details */}
+      <mesh position={[-5.95, 2.6, -5.95]} castShadow>
+        <boxGeometry args={[0.2, 5, 0.2]} />
+        <meshToonMaterial color="#d0e0e8" />
+      </mesh>
+      <mesh position={[5.95, 2.6, -5.95]} castShadow>
+        <boxGeometry args={[0.2, 5, 0.2]} />
+        <meshToonMaterial color="#d0e0e8" />
+      </mesh>
+      <mesh position={[-5.95, 2.6, 5.95]} castShadow>
+        <boxGeometry args={[0.2, 5, 0.2]} />
+        <meshToonMaterial color="#d0e0e8" />
+      </mesh>
+      <mesh position={[5.95, 2.6, 5.95]} castShadow>
+        <boxGeometry args={[0.2, 5, 0.2]} />
+        <meshToonMaterial color="#d0e0e8" />
+      </mesh>
+
+      {/* ==================================================================
+          AWNING DETAILS - Decorative stripes on the overhang
+          ================================================================== */}
+
+      {/* Stripe details on roof overhang */}
+      <mesh position={[0, 5.05, 3]} castShadow>
+        <boxGeometry args={[12.5, 0.05, 0.4]} />
+        <meshToonMaterial color="#ff4422" />
+      </mesh>
+      <mesh position={[0, 5.05, -3]} castShadow>
+        <boxGeometry args={[12.5, 0.05, 0.4]} />
+        <meshToonMaterial color="#ff4422" />
+      </mesh>
+
       {/* Door temporarily removed - will be reimplemented later */}
 
       </group>

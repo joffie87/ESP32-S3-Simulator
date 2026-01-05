@@ -15,10 +15,10 @@ export default function Wire({ wireId, startPos, endPos, color = '#ff6600', inPr
     const start = new THREE.Vector3(...startPos)
     const end = new THREE.Vector3(...endPos)
 
-    // Calculate midpoint and add a slight upward arc
+    // Calculate midpoint and add a downward sag (gravity effect)
     const mid = start.clone().add(end).multiplyScalar(0.5)
     const distance = start.distanceTo(end)
-    mid.y += Math.min(distance * 0.2, 0.3) // Arc height based on distance
+    mid.y -= Math.min(distance * 0.2, 0.3) // Downward sag based on distance (gravity)
 
     return new THREE.QuadraticBezierCurve3(start, mid, end)
   }, [startPos, endPos])
