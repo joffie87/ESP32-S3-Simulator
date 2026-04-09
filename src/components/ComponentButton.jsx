@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Button
+@END_META
+*/
+
 /**
  * PHASE 1 FIX: Entire component wrapped in rotation={[0, Math.PI, 0]}
  * to ensure button plugs into breadboard correctly in world space.

@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Service worker
+@END_META
+*/
+
 // Use dynamic import to avoid Vite build issues
 const loadPyodide = async () => {
   const module = await import('https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.mjs')

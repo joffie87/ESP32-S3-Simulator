@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: L E D
+@END_META
+*/
+
 import { useState, useEffect } from 'react'
 import { useCoding } from '../CodingContext'
 import { Outlines, Text } from '@react-three/drei'

@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Wire
+@END_META
+*/
+
 import { useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { useCoding } from '../CodingContext'

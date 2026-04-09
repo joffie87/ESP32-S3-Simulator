@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: E S P32 Board
+@END_META
+*/
+
 /**
  * ============================================================================
  * ESP32BOARD.JSX - 3D MODEL OF ESP32-S3 MICROCONTROLLER BOARD

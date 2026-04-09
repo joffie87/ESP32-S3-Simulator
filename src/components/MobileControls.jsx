@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Mobile Controls
+@END_META
+*/
+
 import { useState, useEffect, useRef } from 'react'
 
 export default function MobileControls({ onMove, onJump }) {

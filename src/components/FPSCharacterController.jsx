@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: F P S Character Controller
+@END_META
+*/
+
 /**
  * FPS CHARACTER CONTROLLER
  *

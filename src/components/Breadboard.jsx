@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Breadboard
+@END_META
+*/
+
 /**
  * BREADBOARD.JSX - Smart Surface with Grid Snap System
  *

@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Screen Recorder
+@END_META
+*/
+
 /**
  * ============================================================================
  * SCREENRECORDER.JSX - Gameplay Video Recording

@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "constraints": [
+    {
+      "id": 1,
+      "type": "content_guard",
+      "name": "No hardcoded secrets",
+      "enabled": true,
+      "truth_node_ref": null,
+      "rule_text": "Never commit API keys, passwords, or tokens in source files",
+      "config": {
+        "forbidden_patterns": [
+          "(?i)(api[_-]?key|secret[_-]?key|password|passwd|access[_-]?token)\\s*[=:]\\s*['\"][^'\"]{8,}['\"]",
+          "(?i)Bearer\\s+[A-Za-z0-9\\-._~+/]{20,}",
+          "sk-[A-Za-z0-9]{20,}",
+          "ghp_[A-Za-z0-9]{36}",
+          "AKIA[0-9A-Z]{16}"
+        ],
+        "applies_to": [
+          "Write",
+          "Edit",
+          "tvn_edit_file"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "type": "workflow_sequence",
+      "name": "Read context before editing files",
+      "enabled": true,
+      "truth_node_ref": null,
+      "rule_text": "Agents must consult project context before making file edits",
+      "config": {
+        "prerequisite_tools": [
+          "tvn_get_project_info",
+          "tvn_get_relevant_files"
+        ],
+        "gated_tools": [
+          "tvn_edit_file",
+          "Edit",
+          "Write",
+          "MultiEdit"
+        ],
+        "state_key": "context_consulted"
+      }
+    },
+    {
+      "id": 3,
+      "type": "workflow_sequence",
+      "name": "Check memory before editing files",
+      "enabled": true,
+      "truth_node_ref": null,
+      "rule_text": "Agents must read existing memory nodes before making file edits",
+      "config": {
+        "prerequisite_tools": [
+          "tvn_manage_memory"
+        ],
+        "gated_tools": [
+          "tvn_edit_file",
+          "Edit",
+          "Write",
+          "MultiEdit"
+        ],
+        "state_key": "memory_consulted"
+      }
+    },
+    {
+      "id": 4,
+      "type": "workflow_sequence",
+      "name": "Consult truth nodes before editing",
+      "enabled": true,
+      "truth_node_ref": null,
+      "rule_text": "Agents must read truth nodes before making file edits to understand project invariants",
+      "config": {
+        "prerequisite_tools": [
+          "tvn_manage_truth_nodes"
+        ],
+        "gated_tools": [
+          "tvn_edit_file",
+          "Edit",
+          "Write",
+          "MultiEdit"
+        ],
+        "state_key": "truth_nodes_consulted"
+      }
+    },
+    {
+      "id": 5,
+      "type": "header_guard",
+      "name": "Protect Smart Headers from destruction",
+      "enabled": true,
+      "truth_node_ref": null,
+      "rule_text": "Files with @TVN_META Smart Headers must not lose them during edits",
+      "config": {
+        "header_marker": "@TVN_META",
+        "applies_to": [
+          "Write",
+          "Edit",
+          "tvn_edit_file",
+          "MultiEdit"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "type": "staleness_gate",
+      "name": "Auto-checkpoint on stale sessions",
+      "enabled": true,
+      "truth_node_ref": null,
+      "rule_text": "System auto-generates checkpoint after 50 operations; blocks writes after 100 operations without a voluntary memory node",
+      "config": {
+        "max_operations": 50,
+        "auto_checkpoint": true,
+        "block_after": 100
+      }
+    },
+    {
+      "id": 7,
+      "type": "scope_guard",
+      "name": "Ralph task scope enforcement",
+      "enabled": false,
+      "truth_node_ref": null,
+      "rule_text": "Ralph agents may only edit files specified in their task scope",
+      "config": {
+        "scope_file": ".tvn/ralph/task_scope.json",
+        "applies_to": [
+          "Write",
+          "Edit",
+          "tvn_edit_file",
+          "MultiEdit"
+        ]
+      }
+    }
+  ]
+}

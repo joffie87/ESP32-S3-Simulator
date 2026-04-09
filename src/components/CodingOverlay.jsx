@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Coding Overlay
+@END_META
+*/
+
 import { useState, useEffect, useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import { useCoding } from '../CodingContext'

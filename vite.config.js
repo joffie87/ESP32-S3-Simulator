@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Project configuration and dependencies
+@END_META
+*/
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 

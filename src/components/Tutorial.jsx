@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Tutorial
+@END_META
+*/
+
 import { useState } from 'react'
 
 export default function Tutorial() {

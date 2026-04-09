@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Workbench
+@END_META
+*/
+
 /**
  * WORKBENCH.JSX - Interactive work surface
  *

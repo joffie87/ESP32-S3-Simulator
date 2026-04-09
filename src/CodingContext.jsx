@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Coding Context state manager
+@END_META
+*/
+
 /**
  * ============================================================================
  * CODINGCONTEXT.JSX - GLOBAL STATE MANAGEMENT FOR ESP32 SIMULATOR

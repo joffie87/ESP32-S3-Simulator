@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Game Menu
+@END_META
+*/
+
 /**
  * ============================================================================
  * GAMEMENU.JSX - Main pause menu with reset and credits

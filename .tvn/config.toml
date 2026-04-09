@@ -1,0 +1,84 @@
+[smart]
+clusters_default = 5
+mode_default = "file"
+label_style_default = "hybrid"
+include_tests_default = false
+extra_extensions = []
+
+[pack]
+tests_default = "none"
+token_budget_default = 100000
+include_truth_default = true
+
+[search]
+regex_default = true
+limit_default = 20
+case_sensitive_default = false
+
+[editor]
+
+[ui]
+tab_order = [
+    "Files",
+    "Smart Core",
+    "Headers",
+    "Search",
+    "Ignore",
+    "Settings",
+    "History",
+]
+
+[firewall]
+enabled = false
+security_level = "standard"
+
+[context_gate]
+enabled = false
+strict_file_gating = false
+require_truth_nodes = false
+
+[constraints]
+enabled = false
+
+[notion]
+enabled = false
+
+[git_safety]
+enabled = true
+auto_branch = true
+auto_commit = true
+auto_merge = "on_success"
+branch_prefix = "tvn/"
+preserve_branches = true
+stable_categories = [
+    "stable",
+]
+auto_suggest_stable = true
+force_stable_checkpoint = false
+
+[desktop]
+gpu_acceleration = false
+
+[tsp]
+enabled = false
+require_local_auth = false
+session_ttl_hours = 8
+auto_start = true
+
+[tsp.tool_permissions]
+default_scope = [
+    "artisan.*",
+    "project.info",
+    "search.*",
+]
+
+[tsp.tool_permissions.client_scopes]
+
+[project]
+category = "code"
+tags = [
+    "has_code",
+]
+
+[persona]
+enabled = true

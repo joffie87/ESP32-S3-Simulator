@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Use Gamepad
+@END_META
+*/
+
 import { useEffect, useRef } from 'react'
 
 export default function useGamepad(onInput) {

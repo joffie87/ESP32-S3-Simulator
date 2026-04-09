@@ -1,0 +1,38 @@
+# TVN-specific ignore patterns
+# The scanner also respects .gitignore
+
+# TVN internal (backups created by tvn_edit_file)
+.tvn/backups/
+
+# Temporary files
+*.temp
+*.tmp
+*.bak
+*~
+
+# Test outputs (if not already in .gitignore)
+test_output/
+coverage/
+.pytest_cache/
+htmlcov/
+
+# Large data files (adjust for your project)
+*.csv
+*.db
+*.sqlite
+*.parquet
+*.h5
+*.hdf5
+
+# Build artifacts (uncomment as needed)
+# dist/
+# build/
+# *.egg-info/
+
+# IDE and editor files (if not in .gitignore)
+# .vscode/
+# .idea/
+# *.swp
+
+# Add your project-specific patterns below:
+

@@ -1,0 +1,29 @@
+{
+  "conversations": {
+    "tvn_conv_99fe1fa77a0d4026": {
+      "context_consulted": true,
+      "context_consulted_tool": "tvn_get_project_info",
+      "context_consulted_at": 1772348976.0873566,
+      "staleness_6": 3
+    },
+    "tvn_conv_2b4cf6f46b554b8c": {
+      "memory_consulted": true,
+      "memory_consulted_tool": "tvn_manage_memory",
+      "memory_consulted_at": 1774894277.222517,
+      "staleness_6": 0,
+      "staleness_6_last_memory": "2026-03-30T13:11:17.222516"
+    },
+    "tvn_conv_72a987edc97d4ffb": {
+      "context_consulted": true,
+      "context_consulted_tool": "tvn_get_project_info",
+      "context_consulted_at": 1775754141.6401765,
+      "staleness_6": 4,
+      "truth_nodes_consulted": true,
+      "truth_nodes_consulted_tool": "tvn_manage_truth_nodes",
+      "truth_nodes_consulted_at": 1775754512.2233443,
+      "memory_consulted": true,
+      "memory_consulted_tool": "tvn_manage_memory",
+      "memory_consulted_at": 1775754512.4570909
+    }
+  }
+}

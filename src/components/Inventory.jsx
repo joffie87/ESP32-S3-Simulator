@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Inventory
+@END_META
+*/
+
 /**
  * ============================================================================
  * INVENTORY.JSX - COMPONENT SELECTION HOTBAR FOR EDIT MODE

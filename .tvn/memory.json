@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "content": "**Discovery:** Ralph PRD format — PRDs live at `.tvn/ralph/prd.md`. Structure: H1 title, description, then `## Task N: Title` sections separated by `---`. Each task needs `id: N`, `depends_on: [...]`, optional `test_command:` and `acceptance:` (bullet list with `  - ` prefix). Test commands on Windows MUST use `python -c \"...\"` with assertions — never Unix tools (grep/sed/awk/find). Agents must emit `<promise>COMPLETE</promise>` to mark task done. See `.tvn/ralph/prd_template.md` for full annotated example. Ralph auto-appends a memory maintenance task if `promote_on_complete` is true in ralph.json.",
+    "subject": "Ralph PRD format",
+    "created_at": "2026-03-30T13:11:17.218491",
+    "pinned": true,
+    "pin_rule": "auto:discovery",
+    "superseded_by": null,
+    "scope": "main"
+  }
+]

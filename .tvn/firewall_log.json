@@ -1,0 +1,102 @@
+[
+  {
+    "timestamp": "2026-03-01T07:09:33.201568+00:00",
+    "tool_name": "tvn_get_project_info",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_get_project_info",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-03-01T07:09:45.129259+00:00",
+    "tool_name": "tvn_get_relevant_files",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_get_relevant_files",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-03-01T07:09:57.147844+00:00",
+    "tool_name": "tvn_get_relevant_files",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_get_relevant_files",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-03-30T18:11:17.213489+00:00",
+    "tool_name": "tvn_manage_memory",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_manage_memory",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-03-30T18:11:17.216491+00:00",
+    "tool_name": "memory_add",
+    "action": "ALLOW",
+    "rule": "service_governance",
+    "detail": "unknown",
+    "security_level": "standard",
+    "source": "unknown",
+    "actor": "unknown"
+  },
+  {
+    "timestamp": "2026-04-09T17:02:20.110397+00:00",
+    "tool_name": "tvn_get_project_info",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_get_project_info",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-04-09T17:08:32.215913+00:00",
+    "tool_name": "tvn_manage_truth_nodes",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_manage_truth_nodes",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-04-09T17:08:32.451505+00:00",
+    "tool_name": "tvn_manage_memory",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_manage_memory",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-04-09T17:08:32.684491+00:00",
+    "tool_name": "tvn_manage_constraints",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_manage_constraints",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  },
+  {
+    "timestamp": "2026-04-09T17:39:12.400885+00:00",
+    "tool_name": "tvn_clock_in",
+    "action": "LOG",
+    "rule": "mcp_dispatch",
+    "detail": "MCP tool call: tvn_clock_in",
+    "security_level": "standard",
+    "source": "mcp",
+    "actor": "agent"
+  }
+]

@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Draggable
+@END_META
+*/
+
 import { useState, useRef, useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'

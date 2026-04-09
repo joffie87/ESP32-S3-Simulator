@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Player Model
+@END_META
+*/
+
 import { Outlines } from '@react-three/drei'
 
 export default function PlayerModel() {

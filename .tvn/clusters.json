@@ -1,0 +1,108 @@
+{
+  "n_clusters": 5,
+  "clustering_mode": "file",
+  "label_style": "hybrid",
+  "vectors_db_mtime": 1768101272.7515574,
+  "clusters": [
+    {
+      "id": 0,
+      "label": "Authentication & Security (mixed) \u2014 [React] (4444ff)",
+      "files": [
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\main.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\Breadboard.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\CodingOverlay.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\ComponentButton.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\ComponentLED.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\Draggable.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\ESP32Board.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\FPSCharacterController.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\GameMenu.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\Inventory.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\MobileControls.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\PlayerModel.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\ScreenRecorder.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\Tutorial.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\Wire.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\Workbench.jsx"
+      ],
+      "keywords": [
+        "4caf50",
+        "4444ff",
+        "1a1a1a",
+        "000000",
+        "ffffff"
+      ],
+      "frameworks": [
+        "React"
+      ],
+      "dominance": 0.0
+    },
+    {
+      "id": 1,
+      "label": "CLI Commands (React, 2d5016, ffffff) \u2014 [React]",
+      "files": [
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\App.jsx"
+      ],
+      "keywords": [
+        "2d5016",
+        "ffffff",
+        "app",
+        "appcontent",
+        "333333"
+      ],
+      "frameworks": [
+        "React"
+      ],
+      "dominance": 1.0
+    },
+    {
+      "id": 2,
+      "label": "Authentication & Security (mixed) \u2014 [React] (transparent)",
+      "files": [
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\CodingContext.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\Level.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\PlacementManager.jsx",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\components\\ShopBuilding.jsx"
+      ],
+      "keywords": [
+        "transparent",
+        "opacity",
+        "emissiveintensity",
+        "emissive",
+        "ffffff"
+      ],
+      "frameworks": [
+        "React"
+      ],
+      "dominance": 0.0
+    },
+    {
+      "id": 3,
+      "label": "Authentication & Security (mixed) \u2014 [React] (hooks)",
+      "files": [
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\hooks\\useGamepad.jsx"
+      ],
+      "keywords": [],
+      "frameworks": [
+        "React"
+      ],
+      "dominance": 0.0
+    },
+    {
+      "id": 4,
+      "label": "User Interface (asyncio, __main__, pin) \u2014 [Shared]",
+      "files": [
+        "E:\\OneDrive\\ESP32-S3-Simulator\\vite.config.js",
+        "E:\\OneDrive\\ESP32-S3-Simulator\\src\\simulation\\pyodide.worker.js"
+      ],
+      "keywords": [
+        "asyncio",
+        "__main__",
+        "pin",
+        "button"
+      ],
+      "frameworks": [],
+      "dominance": 1.0
+    }
+  ]
+}

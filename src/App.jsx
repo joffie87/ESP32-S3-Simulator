@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Root application component
+@END_META
+*/
+
 import { memo, useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { KeyboardControls, Environment } from '@react-three/drei'

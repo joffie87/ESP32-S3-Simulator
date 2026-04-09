@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Placement Manager system manager
+@END_META
+*/
+
 /**
  * ============================================================================
  * PLACEMENTMANAGER.JSX - Smart Surface-Aware Placement System

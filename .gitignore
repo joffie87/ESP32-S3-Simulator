@@ -1,3 +1,19 @@
-/node_modules
+# TVN Bridge - Ignore the context pack itself
+LLM_CONTEXT.md
+*.context.md
 /.claude
 /Screenshots
+
+
+# Node/Web artifacts (Standard)
+node_modules/
+dist/
+build/
+.cache/
+
+# Lockfiles (High token count, low value)
+package-lock.json
+yarn.lock
+
+# TVN backups
+.tvn/backups/

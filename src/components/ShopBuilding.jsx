@@ -1,3 +1,10 @@
+/*
+@TVN_META
+role: standard
+desc: Shop Building
+@END_META
+*/
+
 /**
  * ============================================================================
  * SHOPBUILDING.JSX - REPAIR SHOP KIOSK STRUCTURE
