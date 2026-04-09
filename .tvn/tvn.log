@@ -1,0 +1,4 @@
+2026-04-09 14:25:55 - tvn_bridge - INFO - Logger initialized (project=E:\OneDrive\RIT Tech\ESP32-S3-Simulator)
+2026-04-09 14:25:55 - tvn_bridge - INFO - Logger initialized (project=E:\OneDrive\RIT Tech\ESP32-S3-Simulator)
+2026-04-09 14:25:55 - tvn_bridge.core.constraints - INFO - Cleaned up 3 stale constraint state entries
+2026-04-09 14:36:22 - tvn_bridge.core.git_safety - WARNING - Git safety: merge conflict for tvn/session-tvn_conv_72a
