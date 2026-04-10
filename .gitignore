@@ -17,3 +17,7 @@ yarn.lock
 
 # TVN backups
 .tvn/backups/
+
+# MCP config — contains machine-specific Windows paths
+.mcp.json
+.mcp.json.lock
