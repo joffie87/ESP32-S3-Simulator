@@ -188,5 +188,45 @@
     "pin_rule": "auto:debrief",
     "superseded_by": null,
     "scope": "main"
+  },
+  {
+    "id": 20,
+    "content": "**Discovery:** Ralph PRD Format — H1 title, project description, then `---` separator. Each task: `## Task N: Title` followed by metadata lines (`id: N`, `depends_on: [1, 2]`, `test_command: pytest tests/`, `acceptance:` with `- criterion` list) and free-form description. Tasks separated by `---`. File lives at `.tvn/ralph/prd.md`.",
+    "subject": "Ralph PRD Format",
+    "created_at": "2026-08-18T16:45:36.236097",
+    "pinned": true,
+    "pin_rule": "auto:seed",
+    "superseded_by": null,
+    "scope": "main"
+  },
+  {
+    "id": 21,
+    "content": "**Discovery:** Clock-In Protocol — Three steps before any edits: (1) `tvn_manage_memory clock_in` returns subjects (one-line summaries) for pinned nodes, full content for blockers/status/recent debriefs+lineage. (2) `tvn_manage_truth_nodes list` for project invariants. (3) `tvn_get_project_info` for stats. Use `tvn_manage_memory get <id>` to load full content of any node.",
+    "subject": "Clock-In Protocol",
+    "created_at": "2026-08-18T16:45:36.236097",
+    "pinned": true,
+    "pin_rule": "auto:seed",
+    "superseded_by": null,
+    "scope": "main"
+  },
+  {
+    "id": 22,
+    "content": "**Discovery:** SUDO Sessions — A human grants elevated authority via the dashboard's Agent Sessions page or `tvn agent-session session start`. AGENTS CANNOT GRANT ONE: that command is a security invariant and will be refused, so never run it yourself. To USE an existing session call `tvn_get_session_token` — it returns the token AND arms the out-of-process firewall hook. Pass the token as `confirmation_id` for governed MCP writes (tvn_edit_file, tvn_apply_headers, tvn_manage_truth_nodes remove/update, tvn_manage_memory clear, tvn_manage_constraints remove/disable). An active session also unblocks native Write/Edit and the constraint engine — but NEVER security invariants or the context gate.",
+    "subject": "SUDO Sessions",
+    "created_at": "2026-08-18T16:45:36.236097",
+    "pinned": true,
+    "pin_rule": "auto:seed",
+    "superseded_by": null,
+    "scope": "main"
+  },
+  {
+    "id": 23,
+    "content": "**Discovery:** When A Tool Call Is BLOCKED — Do NOT retry the same command; read the block message, which names the rule and the remedy. (1) Anything mentioning SUDO: call `tvn_get_session_token`, then retry — a session may already be active but not yet visible to the firewall hook. (2) File edits: use `tvn_edit_file`, not native Write/Edit. (3) Reads outside the project are confined by default; the durable fix is a human adding the path to `[firewall] read_allowlist` in .tvn/config.toml. (4) Cross-project writes need SUDO in the TARGET project — your own project's session will NOT clear them. (5) Security invariants (granting SUDO, disabling the firewall or hooks, editing governance files) are never bypassable: STOP and ask your human.",
+    "subject": "When A Tool Call Is BLOCKED",
+    "created_at": "2026-08-18T16:45:36.236097",
+    "pinned": true,
+    "pin_rule": "auto:seed",
+    "superseded_by": null,
+    "scope": "main"
   }
 ]

@@ -21,3 +21,5 @@ yarn.lock
 # MCP config — contains machine-specific Windows paths
 .mcp.json
 .mcp.json.lock
+/.tvn
+CLAUDE.md

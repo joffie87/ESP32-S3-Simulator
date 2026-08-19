@@ -65,3 +65,74 @@ Always prefix content with a bold type:
 3. **Asset modularity** — no hard-coded `.glb`/`.png`/etc. imports in component files. Use props or a manifest.
 4. **Multi-board ready** — current generic ESP32-S3 is one profile of many. Real target hardware on hand is the **ESP32-S3-Sense**.
 5. **Hardware flash path preserved** — every change must keep the future WebSerial flash feature possible.
+
+## TVN Bridge Protocol
+
+This project is governed by TVN Bridge. Read this before editing anything.
+Section maintained by TVN — edit the prose around it, not the heading.
+
+### 1. Clock in — required before any edit
+
+Call **`tvn_clock_in`**. One call returns pinned memories, truth nodes,
+project info, and your authorization status. Workflow constraints block
+Edit/Write until you have clocked in.
+
+### 2. Check your authorization
+
+`tvn_clock_in` returns a `sudo` block. Act on its `state`:
+
+| state | what it means | what to do |
+|---|---|---|
+| `active` | session valid, firewall hook sees it | nothing — proceed |
+| `needs_arming` | a session IS active but the hook cannot see it yet | call **`tvn_get_session_token`** now, then proceed |
+| `none` | no session granted | use `tvn_edit_file` for edits; ask your human if you need more |
+
+**Only a human can grant a session.** Never run `tvn agent-session session
+start` yourself — it is a security invariant and will be refused.
+
+### 3. Editing
+
+Use **`tvn_edit_file`** (MCP) rather than native Write/Edit. It creates a
+backup in `.tvn/backups/`, records the change in the audit trail, and
+preserves Smart Headers. Governed writes take the session token as
+`confirmation_id`.
+
+### 4. When a tool call is BLOCKED
+
+**Do not retry the same command.** The block message names both the rule and
+the remedy. The common cases:
+
+- *Mentions SUDO* → call `tvn_get_session_token`, then retry.
+- *File edit* → use `tvn_edit_file`.
+- *Read outside the project* → reads are confined to the project tree by
+  default. Ask your human to add the path to `[firewall] read_allowlist` in
+  `.tvn/config.toml`.
+- *Cross-project write* → needs SUDO in the **target** project; a session in
+  this one will not clear it.
+- *Security invariant* → never bypassable by anything. Stop and ask.
+
+### 5. Record what you learned
+
+Add a memory node per significant unit of work, with a bold type prefix:
+
+```
+tvn_manage_memory add "**Decision:** chose X over Y because ..."
+```
+
+Types: `**Decision:**` `**Blocker:**` `**Status:**` `**Discovery:**` `**Plan:**`
+
+At session end call `tvn_manage_memory clock_out`, then submit a
+`debrief`. **Do not write `**Agent Lineage:**` entries by hand** — TVN
+numbers and records them for you.
+
+### Quick reference
+
+| you need | call |
+|---|---|
+| everything, at session start | `tvn_clock_in` |
+| the SUDO token for a governed write | `tvn_get_session_token` |
+| to edit a file | `tvn_edit_file` |
+| files relevant to a topic | `tvn_get_relevant_files "topic"` |
+| to search all memory | `tvn_search_memory "query"` |
+| project invariants | `tvn_manage_truth_nodes list` |
+| to record a finding | `tvn_manage_memory add "**Discovery:** ..."` |
