@@ -1,8 +1,0 @@
-tools:
-  claude_code:
-    type: cli
-    description: Claude Code
-    command: claude
-    category: cli_agent
-    icon: anthropic
-    preset: claude_code
